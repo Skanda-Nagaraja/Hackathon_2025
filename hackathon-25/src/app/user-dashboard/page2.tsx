@@ -1,15 +1,16 @@
 "use client"
+import React from 'react';
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ProfileStats from '@/components/ui/ProfileStats'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Home, GamepadIcon } from 'lucide-react'
-import { UserProvider, useUser } from "@/contexts/UserContext"
+import { useUser } from "@/contexts/UserContext"
 
 
 export default function UserDashboardPage() {
-    const { user, logout } = useUser() as { 
+    const { user } = useUser() as { 
       user: {
         username: string;
         createdAt: Date;
