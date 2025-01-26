@@ -22,6 +22,8 @@ export interface IUser extends Document {
     chosenOption: string;
     isCorrect: boolean;
     playedAt: Date;
+    correctAnswer: string;
+    explaination: string;
   }>;
 
 }
@@ -54,6 +56,8 @@ const UserSchema = new Schema<IUser>(
           chosenOption: { type: String, required: true },
           isCorrect: { type: Boolean, required: true },
           playedAt: { type: Date, default: Date.now },
+          correctAnswer: { type: String, required: true },
+          explaination: { type: String, required: true }
         },
       ],
       required: false, // Align with the interface
