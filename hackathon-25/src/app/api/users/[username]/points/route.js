@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongo";
 import User from "../../../../../../models/User";
+import { NextRequest } from 'next/server';
 
 export async function PATCH(
-    req: Request,
-    context: { params: { username: string } }
+    req,
+    context
 ) {
     try {
         const p = await context.params;
@@ -49,34 +50,27 @@ export async function PATCH(
         );
     }
 }
+
 export async function GET(
-    req: Request,
-    context: { params: { username: string } }
+    request,
+    { params, searchParams }
 ) {
+    const { username } = params;
+
     try {
-        const username =  context.params.username;
+        const { db } = await connectToDatabase();
 
-        await connectToDatabase();
-
-        const user = await User.findOne({ username });
+        // Fetch the user by username
+        const user = await db.collection('users').findOne({ username });
 
         if (!user) {
-            return NextResponse.json(
-                { error: "User not found" },
-                { status: 404 }
-            );
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        return NextResponse.json({
-            username: user.username,
-            totalPoints: user.totalPoints || 0
-        });
-
+        // Assuming `totalPoints` is a field in your user document
+        return NextResponse.json({ points: user.totalPoints }, { status: 200 });
     } catch (error) {
-        console.error("Error fetching points:", error);
-        return NextResponse.json(
-            { error: "Internal Server Error" },
-            { status: 500 }
-        );
+        console.error('Error fetching user points:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
