@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongo";
 import User from "../../../../models/User";
 
-export async function POST(req: Request){
+export async function POST(req: Request) {
     try {
         const { username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explanation } = await req.json();
-
         if (!username || !category || !question || !choices || chosenOption === undefined || isCorrect === undefined || !playedAt || correctAnswer === undefined || explanation === undefined) {
             return NextResponse.json(
                 { error: "All fields (username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explanation) are required" },
@@ -14,7 +13,7 @@ export async function POST(req: Request){
         }
 
         await connectToDatabase();
-        
+
 
         const user = await User.findOne({ username });
         if (!user) {
@@ -38,7 +37,7 @@ export async function POST(req: Request){
 
         // console.log("New game history entry:", newGameHistoryEntry);
 
-      
+
         user.gameHistory.push(newGameHistoryEntry);
 
         console.log("New game history entry:", user.gameHistory[user.gameHistory.length - 1]);
@@ -81,7 +80,7 @@ export async function POST(req: Request){
         // }
 
         // console.log("Saved user game history:", savedUser.gameHistory[savedUser.gameHistory.length - 1]);
-
+        
         return NextResponse.json({ message: "Game history added successfully", user }, { status: 200 });
     } catch (error) {
         console.error("Error in add game history route:", error);

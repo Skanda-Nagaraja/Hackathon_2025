@@ -7,7 +7,8 @@ export async function PATCH(
     context: { params: { username: string } }
 ) {
     try {
-        const username = context.params.username;
+        const p = await context.params;
+        const username = p.username;
         const { points } = await req.json();
 
         if (points === undefined) {
