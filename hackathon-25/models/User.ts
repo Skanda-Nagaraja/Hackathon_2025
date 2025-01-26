@@ -5,6 +5,7 @@ export interface IUser extends Document {
   passwordHash: string;
   totalGamesPlayed?: number;
   totalWins?: number;
+  totalPoints: number;
   categoryStats?: Map<
     string,
     {
@@ -21,6 +22,7 @@ export interface IUser extends Document {
     isCorrect: boolean;
     playedAt: Date;
   }>;
+
 }
 
 const UserSchema = new Schema<IUser>(
@@ -29,6 +31,7 @@ const UserSchema = new Schema<IUser>(
     passwordHash: { type: String, required: true },
     totalGamesPlayed: { type: Number, default: 0, required: false },
     totalWins: { type: Number, default: 0, required: false },
+    totalPoints: { type: Number, default: 0, required: true },
     categoryStats: {
       type: Map,
       of: {
@@ -48,6 +51,7 @@ const UserSchema = new Schema<IUser>(
         playedAt: { type: Date, default: Date.now, required: false },
       },
     ],
+
   },
   { timestamps: true }
 );
