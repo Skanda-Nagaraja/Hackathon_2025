@@ -126,6 +126,8 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
                 chosenOption: questionData.answers[selectedAnswer],
                 isCorrect: isCorrect,
                 playedAt: new Date().toISOString(),
+                correctAnswer: questionData.answers[questionData.correctAnswer],
+                explanation: questionData.explanation,
             }),
           });
 
@@ -359,7 +361,7 @@ function parseResultString(resultString: string): QuestionData {
 
     return {
         question,
-        answers,
+        answers: answers.slice(0, 4),
         correctAnswer: correctAnswerIndex,
         explanation,
     };
