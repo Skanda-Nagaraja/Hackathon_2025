@@ -8,7 +8,11 @@ import { set } from "mongoose";
 import { Console } from "console";
 // Define UserContext
 interface UserContextType {
-  user: { id: string; username: string; points: number } | null;
+  user: {
+    id: string;
+    username: string;
+    points: number;
+  } | null;
   setUser: (user: { id: string; username: string; points: number } | null) => void;
   logout: () => void;
 }
@@ -37,7 +41,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         } else {
           logout();
         }
-      } catch(error) {
+      } catch (error) {
         console.log(error);
         logout();
       }

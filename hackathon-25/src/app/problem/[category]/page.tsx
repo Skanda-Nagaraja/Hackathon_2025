@@ -103,7 +103,7 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
         // if (selectedAnswer !== null) {
         //     setShowFeedback(true);
         // }
-
+        console.log("User data:", user);
         if (selectedAnswer === null || !questionData) return;
 
         setLoading(true);
@@ -112,7 +112,7 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
 
         try {
             const isCorrect = selectedAnswer === questionData.correctAnswer;
-
+            console.log("explanation", questionData.explanation)
           const response = await fetch("/api/game-history", {
             method: "POST",
             headers: {
@@ -168,6 +168,7 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
                 setShowFeedback(true);
             } else {
                 console.error("Error updating game history");
+                console.log(response)
                 setError("Failed to update game history.");
             }
 
@@ -390,6 +391,7 @@ function parseResultString(resultString: string): QuestionData {
 
     const explanationMatch = resultString.match(/Explanation:\s*(.*)/s);
     const explanation = explanationMatch ? explanationMatch[1].trim() : "";
+
 
     return {
         question,

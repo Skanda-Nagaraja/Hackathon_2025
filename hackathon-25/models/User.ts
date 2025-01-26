@@ -23,7 +23,7 @@ export interface IUser extends Document {
     isCorrect: boolean;
     playedAt: Date;
     correctAnswer: string;
-    explaination: string;
+    explanation: string;
   }>;
 
 }
@@ -48,19 +48,18 @@ const UserSchema = new Schema<IUser>(
     },
 
     gameHistory: {
-      type: [
-        {
-          category: { type: String, required: true },
-          question: { type: String, required: true },
-          choices: [{ type: String, required: true }],
-          chosenOption: { type: String, required: true },
-          isCorrect: { type: Boolean, required: true },
-          playedAt: { type: Date, default: Date.now },
-          correctAnswer: { type: String, required: true },
-          explaination: { type: String, required: true }
-        },
-      ],
-      required: false, // Align with the interface
+      type: [{
+        category: { type: String, required: true },
+        question: { type: String, required: true },
+        choices: { type: [String] },
+        chosenOption: { type: String, required: true },
+        isCorrect: { type: Boolean, required: true },
+        playedAt: { type: Date, default: Date.now },
+        correctAnswer: { type: String, required: true },
+        explanation: { type: String, required: true }
+      }],
+      required: false,
+      default: []
     },
 
 
