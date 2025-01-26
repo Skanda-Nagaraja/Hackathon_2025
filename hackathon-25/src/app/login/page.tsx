@@ -148,7 +148,7 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-end p-12">
           <blockquote className="text-lg font-medium text-white max-w-lg">
-          `&quot;`An investment in knowledge pays the best interest.`&quot;`
+          "An investment in knowledge pays the best interest."
             <footer className="mt-2 text-sm text-zinc-300">Benjamin Franklin</footer>
           </blockquote>
         </div>
