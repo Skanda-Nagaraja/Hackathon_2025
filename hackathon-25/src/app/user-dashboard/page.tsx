@@ -1,185 +1,333 @@
 "use client";
 
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
-import { ArrowLeft, LogOut, Trophy } from "lucide-react"
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { ArrowLeft, LogOut, Trophy, Home, GamepadIcon } from "lucide-react";
+import { useUser } from "../../contexts/UserContext";
 
-// Mock data for the problem history
-const problemHistory = [
-  { id: 1, category: "Budgeting", correct: true },
-  { id: 2, category: "Investments", correct: false },
-  { id: 3, category: "Credit & Loans", correct: true },
-  { id: 4, category: "Savings", correct: true },
-  { id: 5, category: "Taxes", correct: false },
-  // Add more entries as needed
-]
-
-// Mock data for the pie chart
-const categoryData = [
-  { name: "Budgeting", value: 30 },
-  { name: "Investments", value: 20 },
-  { name: "Credit & Loans", value: 15 },
-  { name: "Savings", value: 25 },
-  { name: "Taxes", value: 10 },
-]
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
-
-// Mock data for user statistics
-const userStats = {
-  totalGames: 50,
-  totalWins: 35,
-  winRate: 70,
-  rank: 42,
-}
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 export default function UserDashboard() {
-  const router = useRouter()
-  const username = "John Doe" // This would typically come from a user context or state
-  const totalPoints = 1234 // This would typically come from user data
+    const { user, logout } = useUser() as {
+        user: { username: string } | null;
+        logout: () => void;
+    };
 
-  const handleLogout = () => {
-    // Implement logout logic here
-    router.push("/login")
-  }
+    const router = useRouter();
 
-  return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="flex justify-between items-center">
-          <Button variant="ghost" onClick={() => router.push("/dashboard")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
-          <Button variant="destructive" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        </div>
+    // State to store fetched user data
+    const [userData, setUserData] = useState<{
+        _id: string;
+        username: string;
+        totalGamesPlayed: number;
+        totalWins: number;
+        categoryStats: { [category: string]: any };
+        gameHistory: {
+            category: string;
+            question: string;
+            choices: string[];
+            chosenOption: string;
+            isCorrect: boolean;
+            playedAt: string;
+            _id: string;
+        }[];
+        createdAt: Date;
+        updatedAt: Date;
+        __v: number;
+        totalPoints: number;
+    } | null>(null);
 
-        <h1 className="text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">Hello, {username}</h1>
+    const [loading, setLoading] = useState(true); // Loading state
+    const [error, setError] = useState<string | null>(null); // Error state
 
-        <div className="grid gap-8 md:grid-cols-2">
-          <Card>
-            <CardContent className="flex items-center justify-center p-6">
-              <div className="text-center">
-                <h2 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Total Points</h2>
-                <p className="text-6xl font-bold text-amber-500">{totalPoints}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Total Games</h3>
-                  <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{userStats.totalGames}</p>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Total Wins</h3>
-                  <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{userStats.totalWins}</p>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Win Rate</h3>
-                  <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{userStats.winRate}%</p>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Rank</h3>
-                  <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-center">
-                    <Trophy className="w-6 h-6 mr-2 text-amber-500" />
-                    {userStats.rank}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+    // Derived states for UI
+    const [userStats, setUserStats] = useState({
+        totalGames: 0,
+        totalWins: 0,
+        winRate: 0,
+        rank: 0,
+    });
+    const [problemHistory, setProblemHistory] = useState([]);
+    const [categoryData, setCategoryData] = useState([]);
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Problem History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] overflow-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Result</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {problemHistory.map((problem) => (
-                      <TableRow key={problem.id}>
-                        <TableCell>{problem.category}</TableCell>
-                        <TableCell>
-                          <span className={problem.correct ? "text-green-600" : "text-red-600"}>
-                            {problem.correct ? "Correct" : "Incorrect"}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+    useEffect(() => {
+        // Fetch user data from the API
+        async function fetchUserData(username: string) {
+            try {
+                const response = await fetch(`/api/users/${username}/stats`, {
+                    method: "GET",
+                });
+                if (!response.ok) {
+                    console.log(response);
+                    throw new Error("Failed to fetch user data");
+                }
+                const data = await response.json();
+                setUserData(data); // Set the fetched user data
 
-          <div className="space-y-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Category Performance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={categoryData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {categoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="mt-4 flex flex-wrap justify-center gap-4">
-                  {categoryData.map((entry, index) => (
-                    <div key={entry.name} className="flex items-center">
-                      <div className="w-3 h-3 mr-2" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                      <span className="text-sm">{entry.name}</span>
+                // Derive stats
+                setUserStats({
+                    totalGames: data.totalGamesPlayed,
+                    totalWins: data.totalWins,
+                    winRate: data.totalGamesPlayed
+                        ? Math.round((data.totalWins / data.totalGamesPlayed) * 100)
+                        : 0,
+                    rank: data.rank || 0, // Assuming rank is part of data
+                });
+
+                // Process problem history
+                const history = data.gameHistory.map((game: any) => ({
+                    id: game._id,
+                    category: game.category,
+                    correct: game.isCorrect,
+                }));
+                setProblemHistory(history);
+
+                // Process category data for pie chart
+                const categories = Object.keys(data.categoryStats);
+                const catData = categories.map((category) => ({
+                    name: category,
+                    value: data.categoryStats[category].points, // Assuming 'points' represents performance
+                }));
+                // setCategoryData(catData);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                setError("Failed to fetch user data. Please try again.");
+            } finally {
+                setLoading(false); // End loading state
+            }
+        }
+
+        if (user?.username) {
+            // If user exists in the context, fetch their data
+            fetchUserData(user.username);
+        } else {
+            // If no user in context, display a guest state or message
+            setLoading(false);
+        }
+    }, [user]);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push("/login");
+        } catch (error) {
+            console.error("Error during logout:", error);
+            // Optionally handle logout errors
+        }
+    };
+
+    // Show loading spinner or message while fetching data
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+                <p className="text-xl">Loading user data...</p>
+            </div>
+        );
+    }
+
+    // Show an error message if fetching fails
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+                <p className="text-xl text-red-500">{error}</p>
+            </div>
+        );
+    }
+
+    // Show a fallback state for guests (optional)
+    if (!user && !userData) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-8">
+                <p className="mb-4 text-xl">Please log in to view your dashboard.</p>
+                <Button onClick={() => router.push("/login")} className="flex items-center gap-2">
+                    Go to Login
+                </Button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
+            <div className="max-w-6xl mx-auto space-y-8">
+                {/* Navigation Buttons */}
+                <div className="flex justify-between items-center">
+                    <div className="flex flex-wrap gap-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push("/dashboard")}
+                            className="flex items-center gap-2"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                            Back to Dashboard
+                        </Button>
+
                     </div>
-                  ))}
+
+                    <Button variant="destructive" onClick={handleLogout} className="flex items-center gap-2">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                    </Button>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Advice</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-zinc-700 dark:text-zinc-300">
-                  Based on your performance, we recommend focusing more on Investments and Taxes. Try to allocate more
-                  time to these categories to improve your overall financial literacy.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+                <h1 className="text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">
+                    Hello, {userData?.username || "Guest"}
+                </h1>
+
+                <div className="grid gap-8 md:grid-cols-2">
+                    <Card>
+                        <CardContent className="flex items-center justify-center p-6">
+                            <div className="text-center">
+                                <h2 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                                    Total Points
+                                </h2>
+                                <p className="text-6xl font-bold text-amber-500">{userData?.totalPoints || 0}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="text-center">
+                                    <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">
+                                        Total Games
+                                    </h3>
+                                    <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+                                        {userStats.totalGames}
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">
+                                        Total Wins
+                                    </h3>
+                                    <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+                                        {userStats.totalWins}
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">
+                                        Win Rate
+                                    </h3>
+                                    <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+                                        {userStats.winRate}%
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Rank</h3>
+                                    <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-center">
+                                        <Trophy className="w-6 h-6 mr-2 text-amber-500" />
+                                        {userStats.rank}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Problem History</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[300px] overflow-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Category</TableHead>
+                                            <TableHead>Result</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    {/* <TableBody>
+                                        {problemHistory.length > 0 ? (
+                                            problemHistory.map((problem) => (
+                                                <TableRow key={problem.id}>
+                                                    <TableCell>{problem.category}</TableCell>
+                                                    <TableCell>
+                                                        <span
+                                                            className={
+                                                                problem.correct
+                                                                    ? "text-green-600"
+                                                                    : "text-red-600"
+                                                            }
+                                                        >
+                                                            {problem.correct ? "Correct" : "Incorrect"}
+                                                        </span>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={2} className="text-center">
+                                                    No problem history available.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody> */}
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <div className="space-y-8">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Category Performance</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="h-[200px]">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={categoryData}
+                                                cx="50%"
+                                                cy="50%"
+                                                labelLine={false}
+                                                outerRadius={80}
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                            >
+                                                {categoryData.map((entry, index) => (
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={COLORS[index % COLORS.length]}
+                                                    />
+                                                ))}
+                                            </Pie>
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                                <div className="mt-4 flex flex-wrap justify-center gap-4">
+                                    {/* {categoryData.map((entry, index) => (
+                                        <div key={entry.name} className="flex items-center">
+                                            <div
+                                                className="w-3 h-3 mr-2"
+                                                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                            ></div>
+                                            <span className="text-sm">{entry.name}</span>
+                                        </div>
+                                    ))} */}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Advice</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-zinc-700 dark:text-zinc-300">
+                                    Based on your performance, we recommend focusing more on Investments and Taxes. Try to
+                                    allocate more time to these categories to improve your overall financial literacy.
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  )
+    );
 }
-
