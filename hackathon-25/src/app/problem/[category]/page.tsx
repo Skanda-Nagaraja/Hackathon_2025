@@ -30,11 +30,11 @@ export default function ProblemPage() {
     const { user } = useUser();
 
     useEffect(() => {
-      if (!user) {
-        router.push("/login");
-      }
+        if (!user) {
+            router.push("/login");
+        }
     }, [user, router]);
-  
+
     if (!user) return null;
 
     // Safely handle `params.category` and ensure it's a string
@@ -111,33 +111,64 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
         setError(null);
 
         try {
-          const isCorrect = selectedAnswer === questionData.correctAnswer;
+            const isCorrect = selectedAnswer === questionData.correctAnswer;
 
-          const response = await fetch("/api/game-history", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: user.username,
-                category: category,
-                question: questionData.question,
-                choices: questionData.answers,
-                chosenOption: questionData.answers[selectedAnswer],
-                isCorrect: isCorrect,
-                playedAt: new Date().toISOString(),
-            }),
-          });
+            // Update game history
+            const gameHistoryResponse = await fetch("/api/game-history", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: user.username,
+                    category: category,
+                    question: questionData.question,
+                    choices: questionData.answers,
+                    chosenOption: questionData.answers[selectedAnswer],
+                    isCorrect: isCorrect,
+                    playedAt: new Date().toISOString(),
+                }),
+            });
 
-          const data = await response.json();
-          
-          if (response.ok) {
-              console.log("Game history updated successfully:", data.message);
-              setShowFeedback(true);
-          } else {
-              console.error("Error updating game history:", data.error);
-              setError(data.error || "Failed to update game history.");
-          }
+            // Update points (add 10 points for correct answer)
+            if (isCorrect) {
+                const pointsResponse = await fetch(`/api/users/${user.username}/points`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        points: 10, // Add 10 points for correct answer
+                    }),
+                });
+
+                if (pointsResponse.ok) {
+                    const pointsData = await pointsResponse.json();
+                    // Update local user context with new points total
+                    if (user) {
+                        user.points = pointsData.user.totalPoints;
+                    }
+                }
+            }
+
+            // Update wins/games played
+            const winsResponse = await fetch(`/api/users/${user.username}/wins`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    isWin: isCorrect,
+                }),
+            });
+
+            if (gameHistoryResponse.ok) {
+                console.log("Game history updated successfully");
+                setShowFeedback(true);
+            } else {
+                console.error("Error updating game history");
+                setError("Failed to update game history.");
+            }
 
         } catch (error) {
             console.error("Error:", error);
@@ -258,8 +289,8 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
                                                 <Label
                                                     htmlFor={`answer-${index}`}
                                                     className={`flex-grow text-zinc-900 dark:text-zinc-100 ${showFeedback || loading
-                                                            ? "cursor-default"
-                                                            : "cursor-pointer"
+                                                        ? "cursor-default"
+                                                        : "cursor-pointer"
                                                         }`}
                                                 >
                                                     {answer}
@@ -298,8 +329,8 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
                 {showFeedback && questionData && (
                     <Card
                         className={`border-zinc-200 dark:border-zinc-700 ${isCorrect
-                                ? "bg-green-50 dark:bg-green-900/20"
-                                : "bg-red-50 dark:bg-red-900/20"
+                            ? "bg-green-50 dark:bg-green-900/20"
+                            : "bg-red-50 dark:bg-red-900/20"
                             }`}
                     >
                         <CardHeader>
@@ -339,16 +370,18 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
 
 // Helper function to parse the result string from the OpenAI API
 function parseResultString(resultString: string): QuestionData {
+    console.log(resultString)
     const questionMatch = resultString.match(/Question:\s*(.*?)(\n\n|$)/);
     const question = questionMatch ? questionMatch[1].trim() : "";
 
-    const answersMatch = resultString.match(/A\).*?\nB\).*?\nC\).*?\nD\).*/s);
-    const answers = answersMatch
-        ? answersMatch[0]
-            .split("\n")
-            .map((line) => line.replace(/^[A-D]\)\s*/, "").trim())
-        : [];
-
+    // Updated regex to specifically match A) through D) answers
+    const answers: string[] = [];
+    const answerRegex = /([A-D]\)\s*[^\n]+)/g;
+    const answerMatches = resultString.matchAll(answerRegex);
+    for (const match of answerMatches) {
+        answers.push(match[0].replace(/^[A-D]\)\s*/, "").trim());
+    }
+    console.log(answers)
     const correctAnswerMatch = resultString.match(/Correct Answer:\s*([A-D])\)/);
     const correctAnswerIndex = correctAnswerMatch
         ? "ABCD".indexOf(correctAnswerMatch[1])

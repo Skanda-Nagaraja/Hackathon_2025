@@ -5,7 +5,7 @@ import User from "../../../../models/User";
 export async function POST(req: Request){
     try {
         const { username, category, question, choices, chosenOption, isCorrect, playedAt } = await req.json();
-
+        console.log(choices)
         if (!username || !category || !question || !choices || chosenOption === undefined || isCorrect === undefined || !playedAt) {
             return NextResponse.json(
                 { error: "All fields (username, category, question, choices, chosenOption, isCorrect, playedAt) are required" },
