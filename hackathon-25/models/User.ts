@@ -41,7 +41,7 @@ const GameHistorySchema = new Schema<IGameHistory>(
     correctAnswer: { type: String, required: true },
     explanation: { type: String, required: true },
   },
-  { _id: false } // Disable automatic _id for subdocuments
+  { _id: false } 
 );
 
 // Define the `UserSchema` with consistent modifiers
