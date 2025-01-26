@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "../../components/ui/button";
@@ -57,6 +58,7 @@ export default function RegisterPage() {
     }
   };
 
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-zinc-50 dark:bg-zinc-950">
       <Card className="w-full max-w-md border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
@@ -67,11 +69,13 @@ export default function RegisterPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+
             {error && (
               <div className="p-3 text-sm text-red-500 bg-red-100 dark:bg-red-900/20 rounded-md">
                 {error}
               </div>
             )}
+
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -85,6 +89,8 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
+
+
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -110,14 +116,18 @@ export default function RegisterPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
+
             <Button type="submit" className="w-full" disabled={isLoading}>
+
               {isLoading ? "Creating account..." : "Create Account"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <p className="text-sm text-center text-zinc-600 dark:text-zinc-400">
               Already have an account?{" "}
+
               <Button
                 variant="link"
+
                 className="p-0 h-auto font-semibold"
                 onClick={() => router.push("/login")}
               >
@@ -128,5 +138,7 @@ export default function RegisterPage() {
         </form>
       </Card>
     </div>
+
   );
+
 }
