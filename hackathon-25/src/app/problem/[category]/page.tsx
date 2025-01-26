@@ -1,31 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 
-export default function QuestionPage() {
-    const router = useRouter();
-    const [questionData, setQuestionData] = useState<{
-        question: string;
-        answers: string[];
-        correctAnswer: number;
-        explanation: string;
-    } | null>(null);
+interface QuestionData {
+    question: string;
+    answers: string[];
+    correctAnswer: number;
+    explanation: string;
+}
 
+export default function ProblemPage() {
+    const router = useRouter();
+    const params = useParams();
+
+    // Safely handle `params.category` and ensure it's a string
+    const category = decodeURIComponent(
+        typeof params.category === "string" ? params.category : ""
+    ); // Default to empty string if `params.category` is undefined or an array
+
+    const [questionData, setQuestionData] = useState<QuestionData | null>(null);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [showFeedback, setShowFeedback] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    // Fetch question from the OpenAI API
     const fetchQuestion = async () => {
         setLoading(true);
         setShowFeedback(false);
         setSelectedAnswer(null);
+        setError(null);
 
         try {
             const response = await fetch("/api/openai", {
@@ -34,8 +43,7 @@ export default function QuestionPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    prompt:
-                        "Generate a multiple-choice question about budgeting with four answer choices, but only one correct answer. Include the correct answer index and an explanation. In the explanation, include the correct answer. Use this example to format your responses: Question: Which of the following is not a component of a comprehensive personal budget?\n\nA) Housing Expenses\nB) Entertainment Costs\nC) Car Payment\nD) Brand Preferences\n\nCorrect Answer: D) Brand Preferences\n\nExplanation: Correct Answer: D, Brand Preferences. While personal preferences such as brand choices can indeed affect your spending, they do not constitute an official category in the budgeting process. All the other options like housing expenses, entertainment costs, and car payments are typical components of most personal budgets.",
+                    prompt: generatePrompt(category),
                 }),
             });
 
@@ -45,16 +53,35 @@ export default function QuestionPage() {
                 setQuestionData(parsedData);
             } else {
                 console.error("Error fetching question:", data.error);
+                setError(data.error || "Failed to fetch question.");
             }
         } catch (error) {
             console.error("Error:", error);
+            setError("An unexpected error occurred.");
         } finally {
             setLoading(false);
         }
     };
 
+    const generatePrompt = (category: string) => {
+        return `Generate a multiple-choice question about ${category} with four answer choices, but only one correct answer. Include the correct answer index and an explanation. In the explanation, include the correct answer. Use this example to format your responses:
+
+Question: Which of the following is not a component of a comprehensive personal budget?
+
+A) Housing Expenses
+B) Entertainment Costs
+C) Car Payment
+D) Brand Preferences
+
+Correct Answer: D) Brand Preferences
+
+Explanation: Correct Answer: D, Brand Preferences. While personal preferences such as brand choices can indeed affect your spending, they do not constitute an official category in the budgeting process. All the other options like housing expenses, entertainment costs, and car payments are typical components of most personal budgets.`;
+    };
+
     const handleSubmit = () => {
-        setShowFeedback(true);
+        if (selectedAnswer !== null) {
+            setShowFeedback(true);
+        }
     };
 
     const isCorrect = selectedAnswer === questionData?.correctAnswer;
@@ -72,17 +99,22 @@ export default function QuestionPage() {
                 <Card className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
                     <CardHeader>
                         <CardTitle className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-                            {questionData ? "Quiz Question" : "Start a Quiz"}
+                            {questionData ? `Quiz Question - ${category}` : "Start a Quiz"}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                        {error && (
+                            <div className="text-red-500 dark:text-red-400">
+                                {error}
+                            </div>
+                        )}
                         {questionData ? (
                             <>
                                 <div className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
                                     {questionData.question}
                                 </div>
                                 <RadioGroup
-                                    value={selectedAnswer?.toString()}
+                                    value={selectedAnswer !== null ? selectedAnswer.toString() : ""}
                                     onValueChange={(value) => setSelectedAnswer(Number.parseInt(value))}
                                     className="space-y-3"
                                 >
@@ -157,12 +189,10 @@ export default function QuestionPage() {
 }
 
 // Helper function to parse the result string from the OpenAI API
-const parseResultString = (resultString: string) => {
-    // Extract the question
+function parseResultString(resultString: string): QuestionData {
     const questionMatch = resultString.match(/Question:\s*(.*?)(\n\n|$)/);
     const question = questionMatch ? questionMatch[1].trim() : "";
 
-    // Extract the answers (assumes answers are in the format A) ...\nB) ...\n)
     const answersMatch = resultString.match(/A\).*?\nB\).*?\nC\).*?\nD\).*/s);
     const answers = answersMatch
         ? answersMatch[0]
@@ -170,11 +200,9 @@ const parseResultString = (resultString: string) => {
             .map((line) => line.replace(/^[A-D]\)\s*/, "").trim())
         : [];
 
-    // Extract the correct answer
     const correctAnswerMatch = resultString.match(/Correct Answer:\s*([A-D])\)/);
     const correctAnswerIndex = correctAnswerMatch ? "ABCD".indexOf(correctAnswerMatch[1]) : -1;
 
-    // Extract the explanation
     const explanationMatch = resultString.match(/Explanation:\s*(.*)/s);
     const explanation = explanationMatch ? explanationMatch[1].trim() : "";
 
@@ -184,4 +212,4 @@ const parseResultString = (resultString: string) => {
         correctAnswer: correctAnswerIndex,
         explanation,
     };
-};
+}
