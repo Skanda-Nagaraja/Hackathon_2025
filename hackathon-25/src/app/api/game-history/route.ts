@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongo";
 import User from "../../../../models/User";
 
+
 export async function POST(req: Request) {
     try {
         const { username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explanation } = await req.json();
-        console.log("Received data:", { username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explanation });
         if (!username || !category || !question || !choices || chosenOption === undefined || isCorrect === undefined || !playedAt || correctAnswer === undefined || explanation === undefined) {
             return NextResponse.json(
                 { error: "All fields (username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explanation) are required" },

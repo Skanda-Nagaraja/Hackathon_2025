@@ -104,7 +104,7 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
         // if (selectedAnswer !== null) {
         //     setShowFeedback(true);
         // }
-        console.log("User data:", user);
+
         if (selectedAnswer === null || !questionData) return;
 
         setLoading(true);
