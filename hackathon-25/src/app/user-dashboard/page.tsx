@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
-import { ArrowLeft, LogOut } from "lucide-react"
+import { ArrowLeft, LogOut, Trophy } from "lucide-react"
 
 // Mock data for the problem history
 const problemHistory = [
@@ -27,6 +27,14 @@ const categoryData = [
 ]
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
+
+// Mock data for user statistics
+const userStats = {
+  totalGames: 50,
+  totalWins: 35,
+  winRate: 70,
+  rank: 42,
+}
 
 export default function UserDashboard() {
   const router = useRouter()
@@ -54,14 +62,41 @@ export default function UserDashboard() {
 
         <h1 className="text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">Hello, {username}</h1>
 
-        <Card>
-          <CardContent className="flex items-center justify-center p-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Total Points</h2>
-              <p className="text-6xl font-bold text-amber-500">{totalPoints}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid gap-8 md:grid-cols-2">
+          <Card>
+            <CardContent className="flex items-center justify-center p-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Total Points</h2>
+                <p className="text-6xl font-bold text-amber-500">{totalPoints}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Total Games</h3>
+                  <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{userStats.totalGames}</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Total Wins</h3>
+                  <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{userStats.totalWins}</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Win Rate</h3>
+                  <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{userStats.winRate}%</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Rank</h3>
+                  <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-center">
+                    <Trophy className="w-6 h-6 mr-2 text-amber-500" />
+                    {userStats.rank}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Card>
@@ -147,3 +182,4 @@ export default function UserDashboard() {
     </div>
   )
 }
+
