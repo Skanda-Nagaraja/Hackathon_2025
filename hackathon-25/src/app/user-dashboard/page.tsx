@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { ArrowLeft, LogOut, Trophy, Home, GamepadIcon } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"; // Added Tooltip and Legend
+import { ArrowLeft, LogOut, Trophy } from "lucide-react";
 import { useUser } from "../../contexts/UserContext";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
@@ -51,9 +51,10 @@ export default function UserDashboard() {
         winRate: 0,
         rank: 0,
     });
-    const [problemHistory, setProblemHistory] = useState([]);
-    const [categoryData, setCategoryData] = useState([]);
+    const [problemHistory, setProblemHistory] = useState<any[]>([]);
+    const [categoryData, setCategoryData] = useState<any[]>([]);
 
+    // 1. Fetch the user’s own data (games played, points, etc.)
     useEffect(() => {
         // Fetch user data from the API
         async function fetchUserData(username: string) {
@@ -69,14 +70,15 @@ export default function UserDashboard() {
                 setUserData(data); // Set the fetched user data
 
                 // Derive stats
-                setUserStats({
+                setUserStats((prev) => ({
+                    ...prev,
                     totalGames: data.totalGamesPlayed,
                     totalWins: data.totalWins,
                     winRate: data.totalGamesPlayed
                         ? Math.round((data.totalWins / data.totalGamesPlayed) * 100)
                         : 0,
-                    rank: data.rank || 0, // Assuming rank is part of data
-                });
+                    // We'll update rank separately in the second useEffect
+                }));
 
                 // Process problem history
                 const history = data.gameHistory.map((game: any) => ({
@@ -90,9 +92,10 @@ export default function UserDashboard() {
                 const categories = Object.keys(data.categoryStats);
                 const catData = categories.map((category) => ({
                     name: category,
-                    value: data.categoryStats[category].points, // Assuming 'points' represents performance
+                    value: data.categoryStats[category]?.gamesPlayed || 0, // Use 'gamesPlayed'
                 }));
-                // setCategoryData(catData);
+                console.log("Category Data for PieChart:", catData); // Debugging
+                setCategoryData(catData);
             } catch (error) {
                 console.error("Error fetching user data:", error);
                 setError("Failed to fetch user data. Please try again.");
@@ -108,6 +111,45 @@ export default function UserDashboard() {
             // If no user in context, display a guest state or message
             setLoading(false);
         }
+    }, [user]);
+
+    // 2. Fetch leaderboard separately to find the rank of the logged-in user
+    useEffect(() => {
+        // Only fetch if we have a valid username
+        if (!user?.username) return;
+
+        const fetchLeaderboard = async () => {
+            try {
+                const response = await fetch("/api/leaderboard");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch leaderboard");
+                }
+                const data = await response.json();
+
+                // Sort descending by totalPoints
+                const sorted = data.sort(
+                    (a: any, b: any) => b.totalPoints - a.totalPoints
+                );
+
+                // Find the index of our current user
+                const indexOfUser = sorted.findIndex(
+                    (item: any) => item.username === user.username
+                );
+
+                // If the user is found, update the rank in our userStats
+                if (indexOfUser !== -1) {
+                    const rank = indexOfUser + 1;
+                    setUserStats((prev) => ({
+                        ...prev,
+                        rank: rank,
+                    }));
+                }
+            } catch (error) {
+                console.error("Error fetching leaderboard:", error);
+            }
+        };
+
+        fetchLeaderboard();
     }, [user]);
 
     const handleLogout = async () => {
@@ -164,10 +206,13 @@ export default function UserDashboard() {
                             <ArrowLeft className="h-4 w-4" />
                             Back to Dashboard
                         </Button>
-
                     </div>
 
-                    <Button variant="destructive" onClick={handleLogout} className="flex items-center gap-2">
+                    <Button
+                        variant="destructive"
+                        onClick={handleLogout}
+                        className="flex items-center gap-2"
+                    >
                         <LogOut className="mr-2 h-4 w-4" />
                         Logout
                     </Button>
@@ -184,7 +229,9 @@ export default function UserDashboard() {
                                 <h2 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
                                     Total Points
                                 </h2>
-                                <p className="text-6xl font-bold text-amber-500">{userData?.totalPoints || 0}</p>
+                                <p className="text-6xl font-bold text-amber-500">
+                                    {userData?.totalPoints || 0}
+                                </p>
                             </div>
                         </CardContent>
                     </Card>
@@ -216,7 +263,9 @@ export default function UserDashboard() {
                                     </p>
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">Rank</h3>
+                                    <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">
+                                        Rank
+                                    </h3>
                                     <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-center">
                                         <Trophy className="w-6 h-6 mr-2 text-amber-500" />
                                         {userStats.rank}
@@ -241,7 +290,7 @@ export default function UserDashboard() {
                                             <TableHead>Result</TableHead>
                                         </TableRow>
                                     </TableHeader>
-                                    {/* <TableBody>
+                                    <TableBody>
                                         {problemHistory.length > 0 ? (
                                             problemHistory.map((problem) => (
                                                 <TableRow key={problem.id}>
@@ -266,7 +315,7 @@ export default function UserDashboard() {
                                                 </TableCell>
                                             </TableRow>
                                         )}
-                                    </TableBody> */}
+                                    </TableBody>
                                 </Table>
                             </div>
                         </CardContent>
@@ -278,7 +327,7 @@ export default function UserDashboard() {
                                 <CardTitle>Category Performance</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="h-[200px]">
+                                <div className="h-[200px] overflow-auto"> {/* Increased height for better visibility */}
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
@@ -289,6 +338,7 @@ export default function UserDashboard() {
                                                 outerRadius={80}
                                                 fill="#8884d8"
                                                 dataKey="value"
+                                                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                                             >
                                                 {categoryData.map((entry, index) => (
                                                     <Cell
@@ -297,19 +347,23 @@ export default function UserDashboard() {
                                                     />
                                                 ))}
                                             </Pie>
+                                            <Tooltip /> {/* Added Tooltip */}
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
                                 <div className="mt-4 flex flex-wrap justify-center gap-4">
-                                    {/* {categoryData.map((entry, index) => (
+                                    {categoryData.map((entry, index) => (
                                         <div key={entry.name} className="flex items-center">
                                             <div
                                                 className="w-3 h-3 mr-2"
-                                                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                                style={{
+                                                    backgroundColor:
+                                                        COLORS[index % COLORS.length],
+                                                }}
                                             ></div>
                                             <span className="text-sm">{entry.name}</span>
                                         </div>
-                                    ))} */}
+                                    ))}
                                 </div>
                             </CardContent>
                         </Card>
@@ -320,8 +374,9 @@ export default function UserDashboard() {
                             </CardHeader>
                             <CardContent>
                                 <p className="text-zinc-700 dark:text-zinc-300">
-                                    Based on your performance, we recommend focusing more on Investments and Taxes. Try to
-                                    allocate more time to these categories to improve your overall financial literacy.
+                                    Based on your performance, we recommend focusing more on
+                                    Investments and Taxes. Try to allocate more time to these
+                                    categories to improve your overall financial literacy.
                                 </p>
                             </CardContent>
                         </Card>

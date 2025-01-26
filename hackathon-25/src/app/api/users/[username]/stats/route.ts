@@ -32,9 +32,23 @@ export async function GET(
             );
         }
 
-        const { passwordHash, ...userData } = user.toObject();
+        const { passwordHash, categoryStats, ...userData } = user.toObject();
 
-        return NextResponse.json(userData, { status: 200 });
+        // If categoryStats is a Map, convert it to a plain object
+        const categoryStatsObject =
+            categoryStats instanceof Map
+                ? Object.fromEntries(categoryStats) // Convert Map to Object
+                : categoryStats; // Already an object
+
+        // Add the transformed categoryStats back to the response
+        const responseData = {
+            ...userData,
+            categoryStats: categoryStatsObject,
+        };
+
+        console.log("User data:", responseData);
+
+        return NextResponse.json(responseData, { status: 200 });
     } catch (error) {
         console.error("Error fetching user stats:", error);
         return NextResponse.json(

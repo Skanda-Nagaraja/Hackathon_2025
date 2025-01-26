@@ -30,11 +30,11 @@ export default function ProblemPage() {
     const { user } = useUser();
 
     useEffect(() => {
-      if (!user) {
-        router.push("/login");
-      }
+        if (!user) {
+            router.push("/login");
+        }
     }, [user, router]);
-  
+
     if (!user) return null;
 
     // Safely handle `params.category` and ensure it's a string
@@ -95,7 +95,7 @@ D) Brand Preferences
 
 Correct Answer: D) Brand Preferences
 
-Explanation: Correct Answer: D, Brand Preferences. While personal preferences such as brand choices can indeed affect your spending, they do not constitute an official category in the budgeting process. All the other options like housing expenses, entertainment costs, and car payments are typical components of most personal budgets.`;
+Explination: Correct Answer: D, Brand Preferences. While personal preferences such as brand choices can indeed affect your spending, they do not constitute an official category in the budgeting process. All the other options like housing expenses, entertainment costs, and car payments are typical components of most personal budgets.`;
     };
 
     // Handle answer submission
@@ -111,35 +111,35 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
         setError(null);
 
         try {
-          const isCorrect = selectedAnswer === questionData.correctAnswer;
+            const isCorrect = selectedAnswer === questionData.correctAnswer;
 
-          const response = await fetch("/api/game-history", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: user.username,
-                category: category,
-                question: questionData.question,
-                choices: questionData.answers,
-                chosenOption: questionData.answers[selectedAnswer],
-                isCorrect: isCorrect,
-                playedAt: new Date().toISOString(),
-                correctAnswer: questionData.answers[questionData.correctAnswer],
-                explanation: questionData.explanation,
-            }),
-          });
+            const response = await fetch("/api/game-history", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: user.username,
+                    category: category,
+                    question: questionData.question,
+                    choices: questionData.answers,
+                    chosenOption: questionData.answers[selectedAnswer],
+                    isCorrect: isCorrect,
+                    playedAt: new Date().toISOString(),
+                    correctAnswer: questionData.answers[questionData.correctAnswer],
+                    explanation: questionData.explanation,
+                }),
+            });
 
-          const data = await response.json();
-          
-          if (response.ok) {
-              console.log("Game history updated successfully:", data.message);
-              setShowFeedback(true);
-          } else {
-              console.error("Error updating game history:", data.error);
-              setError(data.error || "Failed to update game history.");
-          }
+            const data = await response.json();
+
+            if (response.ok) {
+                console.log("Game history updated successfully:", data.message);
+                setShowFeedback(true);
+            } else {
+                console.error("Error updating game history:", data.error);
+                setError(data.error || "Failed to update game history.");
+            }
 
         } catch (error) {
             console.error("Error:", error);
@@ -260,8 +260,8 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
                                                 <Label
                                                     htmlFor={`answer-${index}`}
                                                     className={`flex-grow text-zinc-900 dark:text-zinc-100 ${showFeedback || loading
-                                                            ? "cursor-default"
-                                                            : "cursor-pointer"
+                                                        ? "cursor-default"
+                                                        : "cursor-pointer"
                                                         }`}
                                                 >
                                                     {answer}
@@ -300,8 +300,8 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
                 {showFeedback && questionData && (
                     <Card
                         className={`border-zinc-200 dark:border-zinc-700 ${isCorrect
-                                ? "bg-green-50 dark:bg-green-900/20"
-                                : "bg-red-50 dark:bg-red-900/20"
+                            ? "bg-green-50 dark:bg-green-900/20"
+                            : "bg-red-50 dark:bg-red-900/20"
                             }`}
                     >
                         <CardHeader>
