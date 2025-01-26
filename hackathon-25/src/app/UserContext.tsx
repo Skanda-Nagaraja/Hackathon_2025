@@ -5,16 +5,15 @@ import { useRouter } from "next/navigation";
 
 // Define UserContext
 interface UserContextType {
-  user: { id: string; username: string } | null;
-  setUser: (user: { id: string; username: string } | null) => void;
+  user: { id: string; username: string; points: number } | null;
+  setUser: (user: { id: string; username: string; points: number } | null) => void;
   logout: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Create Provider
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<{ id: string; username: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; username: string; points: number } | null>(null);
   const router = useRouter();
 
   const logout = () => {
@@ -29,7 +28,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Custom hook to use UserContext
 export function useUser() {
   const context = useContext(UserContext);
   if (!context) {
