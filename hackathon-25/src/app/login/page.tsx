@@ -87,7 +87,7 @@ export default function LoginPage() {
           <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-8 block">
             MoneyMind 
           </h1>
-          <h1 className="text-2xl tracking-tight mb-8 text-zinc-900 dark:text-zinc-100">Welcome back</h1>
+          <h1 className="text-2xl tracking-tight mb-8 text-zinc-900 dark:text-zinc-100">Welcome back!</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="p-3 text-sm text-red-500 bg-red-100 dark:bg-red-900/20 rounded-md">
