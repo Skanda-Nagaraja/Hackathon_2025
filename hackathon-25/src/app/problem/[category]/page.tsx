@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, use } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -66,10 +66,9 @@ export default function ProblemPage({ params }: { params: { category: string } }
               <div
                 key={index}
                 className={`flex items-center space-x-2 rounded-lg border p-4 transition-colors
-                  ${
-                    selectedAnswer === index
-                      ? "border-zinc-900 dark:border-zinc-100"
-                      : "border-zinc-200 dark:border-zinc-700"
+                  ${selectedAnswer === index
+                    ? "border-zinc-900 dark:border-zinc-100"
+                    : "border-zinc-200 dark:border-zinc-700"
                   }`}
               >
                 <RadioGroupItem value={index.toString()} id={`answer-${index}`} />
@@ -90,11 +89,10 @@ export default function ProblemPage({ params }: { params: { category: string } }
 
           {showFeedback && (
             <div
-              className={`w-full p-4 rounded-lg ${
-                isCorrect
+              className={`w-full p-4 rounded-lg ${isCorrect
                   ? "bg-green-50 dark:bg-green-900/20 text-green-900 dark:text-green-100"
                   : "bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-100"
-              }`}
+                }`}
             >
               <div className="flex items-center mb-2">
                 {isCorrect ? <CheckCircle2 className="mr-2 h-5 w-5" /> : <XCircle className="mr-2 h-5 w-5" />}
