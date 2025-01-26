@@ -56,6 +56,8 @@ export default function UserDashboard() {
             chosenOption: string;
             isCorrect: boolean;
             playedAt: string;
+            correctAnswer: string;
+            explanation: string;
             _id: string;
         }[];
         createdAt: Date;
@@ -338,12 +340,21 @@ export default function UserDashboard() {
                                 {problemHistory.map((problem) => (
                                 <TableRow key={problem.id} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                                     <TableCell>
-                                    <Link
+                                    {/* <Link
                                         href={`/problem/${encodeURIComponent(problem.category)}`}
                                         className=" hover:underline"
                                     >
                                         {problem.category}
-                                    </Link>
+                                    </Link> */}
+                                        <Link
+                                            href={{
+                                                pathname: "/problem-history", // Target problem page
+                                                query: { problem: JSON.stringify(problem) }, // Pass problem data as query
+                                            }}
+                                            className=" hover:underline"
+                                        >
+                                            {problem.category}
+                                        </Link>
                                     </TableCell>
                                     <TableCell>
                                     <span className={problem.correct ? "text-green-600" : "text-red-600"}>
@@ -356,7 +367,7 @@ export default function UserDashboard() {
                             </Table>
                         </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4 italic">
-                            Click on a category to generate a new problem
+                            Click on a category to view the problem and solution.
                         </p>
                         </CardContent>
                     </Card>
