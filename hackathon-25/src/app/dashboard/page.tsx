@@ -70,7 +70,10 @@ export default function DashboardPage() {
                                     <Link href="/user-dashboard">User Dashboard</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                                {/* Logout styled in red */}
+                                <DropdownMenuItem onClick={logout} className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900">
+                                    Logout
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                         <ModeToggle />
