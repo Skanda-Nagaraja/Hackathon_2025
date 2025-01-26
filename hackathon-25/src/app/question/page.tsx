@@ -1,167 +1,132 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { CheckCircle2, XCircle, ArrowLeft } from "lucide-react"
 
-export default function QuestionPage() {
-    const [questionData, setQuestionData] = useState<{
-        question: string;
-        answers: string[];
-        correctAnswer: number;
-        explanation: string;
-    } | null>(null);
+const problems = {
+    Budgeting: {
+        question: "What is the 50/30/20 rule in budgeting?",
+        answers: [
+            "50% needs, 30% wants, 20% savings",
+            "50% savings, 30% needs, 20% wants",
+            "50% wants, 30% savings, 20% needs",
+            "50% needs, 30% savings, 20% wants",
+        ],
+        correctAnswer: 0,
+        explanation:
+            "The 50/30/20 rule suggests allocating 50% of your income to needs, 30% to wants, and 20% to savings and debt repayment.",
+    },
+}
 
-    const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-    const [showFeedback, setShowFeedback] = useState(false);
-    const [loading, setLoading] = useState(false);
+export default function ProblemPage({ params }: { params: { category: string } }) {
+    const router = useRouter()
+    const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+    const [showFeedback, setShowFeedback] = useState(false)
+    const [category, setCategory] = useState<string | null>(null)
 
-    const fetchQuestion = async () => {
-        setLoading(true);
-        setShowFeedback(false);
-        setSelectedAnswer(null);
-
-        try {
-            const response = await fetch("/api/openai", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    prompt:
-                        "Generate a multiple-choice question about budgeting with four answer choices, but only one correct answer. Include the correct answer index and an explanation. In the explanation, include the correct answer." +
-                        "Use this example to format your responses." + 
-                        "Question: Which of the following is not a component of a comprehensive personal budget?\n\nA) Housing Expenses\nB) Entertainment Costs\nC) Car Payment\nD) Brand Preferences\n\nCorrect Answer: D) Brand Preferences\n\nExplanation: Correct Answer: D. Brand Preferences. While personal preferences such as brand choices can indeed affect your spending, they do not constitute an official category in the budgeting process. All the other options like housing expenses, entertainment costs, and car payments are typical components of most personal budgets."
-                        
-                }),
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                // Parse the OpenAI response
-                const parsedData = parseResultString(data.result); // Use the parsing function
-                setQuestionData(parsedData);
-            } else {
-                console.error("Error fetching question:", data.error);
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setLoading(false);
-            updateRadioGroup(); // Reset the RadioGroup state
+    useEffect(() => {
+        async function fetchParams() {
+            const unwrappedParams = await params
+            setCategory(unwrappedParams.category)
         }
-    };
+        fetchParams()
+    }, [params])
+
+    if (!category) return <div>Loading...</div>
+
+    const problem = problems[category as keyof typeof problems]
+    if (!problem) return <div>Problem not found</div>
 
     const handleSubmit = () => {
-        setShowFeedback(true);
-    };
+        if (selectedAnswer !== null) {
+            setShowFeedback(true)
+        }
+    }
 
-    const updateRadioGroup = () => {
-        setSelectedAnswer(null); // Reset the selected answer
-    };
-
-    const isCorrect = selectedAnswer === questionData?.correctAnswer;
+    const isCorrect = selectedAnswer === problem.correctAnswer
 
     return (
-        <div className="min-h-screen p-4 md:p-8">
-            <h1 className="text-2xl font-bold text-center mb-6">AI-Powered Quiz</h1>
+        <div className="min-h-screen p-4 md:p-8 bg-zinc-50 dark:bg-zinc-950">
+            <Button variant="ghost" className="mb-8" onClick={() => router.push("/dashboard")}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Categories
+            </Button>
 
-            <div className="flex justify-center mb-8">
-                <Button onClick={fetchQuestion} disabled={loading}>
-                    {loading ? "Loading Question..." : "Get a New Question"}
-                </Button>
-            </div>
-
-            {questionData && (
-                <Card className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto space-y-6">
+                {/* Question Card */}
+                <Card className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
                     <CardHeader>
-                        <h2 className="text-lg font-semibold">{questionData.question}</h2>
+                        <CardTitle className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{category}</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-6">
+                        <div className="text-lg font-medium text-zinc-900 dark:text-zinc-100">{problem.question}</div>
                         <RadioGroup
-                            value={selectedAnswer?.toString() || ""}
-                            onValueChange={(value) => setSelectedAnswer(Number(value))}
-                            className="space-y-4"
+                            value={selectedAnswer?.toString()}
+                            onValueChange={(value) => setSelectedAnswer(Number.parseInt(value))}
+                            className="space-y-3"
                         >
-                            {questionData.answers.slice(0, 4).map((answer, index) => (
+                            {problem.answers.map((answer, index) => (
                                 <div
                                     key={index}
-                                    className={`flex items-center space-x-2 rounded-lg border p-4 transition-colors ${
-                                        selectedAnswer === index
-                                            ? "border-blue-500"
-                                            : "border-gray-300"
-                                    }`}
+                                    className={`flex items-center space-x-2 rounded-lg border p-4 transition-colors
+                    ${selectedAnswer === index
+                                            ? "border-zinc-900 dark:border-zinc-100"
+                                            : "border-zinc-200 dark:border-zinc-700"
+                                        }`}
                                 >
-                                    <RadioGroupItem
-                                        value={index.toString()}
-                                        id={`answer-${index}`}
-                                    />
-                                    <Label htmlFor={`answer-${index}`} className="flex-grow">
+                                    <RadioGroupItem value={index.toString()} id={`answer-${index}`} />
+                                    <Label
+                                        htmlFor={`answer-${index}`}
+                                        className="flex-grow cursor-pointer text-zinc-900 dark:text-zinc-100"
+                                    >
                                         {answer}
                                     </Label>
                                 </div>
                             ))}
                         </RadioGroup>
                     </CardContent>
-                    <CardFooter className="flex flex-col space-y-4">
-                        <Button
-                            onClick={handleSubmit}
-                            disabled={selectedAnswer === null || showFeedback}
-                        >
+                    <CardFooter>
+                        <Button onClick={handleSubmit} className="w-full" disabled={selectedAnswer === null || showFeedback}>
                             Submit Answer
                         </Button>
-
-                        {showFeedback && (
-                            <div
-                                className={`mt-6 p-4 rounded-lg ${
-                                    isCorrect
-                                        ? "bg-green-100 text-green-800"
-                                        : "bg-red-100 text-red-800"
-                                }`}
-                            >
-                                <p className="font-medium">
-                                    {isCorrect ? "Correct!" : "Incorrect"}
-                                </p>
-                                <p className="mt-2">{questionData.explanation}</p>
-                            </div>
-                        )}
                     </CardFooter>
                 </Card>
-            )}
+
+                {/* Explanation Card */}
+                {showFeedback && (
+                    <Card
+                        className={`border-zinc-200 dark:border-zinc-700 ${isCorrect ? "bg-green-50 dark:bg-green-900/20" : "bg-red-50 dark:bg-red-900/20"
+                            }`}
+                    >
+                        <CardHeader>
+                            <CardTitle className="flex items-center text-xl font-semibold">
+                                {isCorrect ? (
+                                    <>
+                                        <CheckCircle2 className="mr-2 h-5 w-5 text-green-600" /> Correct!
+                                    </>
+                                ) : (
+                                    <>
+                                        <XCircle className="mr-2 h-5 w-5 text-red-600" /> Incorrect
+                                    </>
+                                )}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-zinc-900 dark:text-zinc-100">{problem.explanation}</p>
+                        </CardContent>
+                        <CardFooter>
+                            <Button onClick={() => router.push("/dashboard")} className="w-full" variant="outline">
+                                Next Problem
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                )}
+            </div>
         </div>
-    );
+    )
 }
-
-// Helper function to parse the result string from the OpenAI API
-const parseResultString = (resultString: string) => {
-    // Extract the question
-    const questionMatch = resultString.match(/Question:\s*(.*?)(\n\n|$)/);
-    const question = questionMatch ? questionMatch[1].trim() : "";
-
-    // Extract the answers (assumes answers are in the format A) ...\nB) ...\n)
-    const answersMatch = resultString.match(/A\).*?\nB\).*?\nC\).*?\nD\).*/s);
-    const answers = answersMatch
-        ? answersMatch[0]
-              .split("\n") // Split by lines
-              .map((line) => line.replace(/^[A-D]\)\s*/, "").trim()) // Remove "A) ", "B) ", etc.
-        : [];
-
-    // Extract the correct answer (e.g., "Correct Answer: D)")
-    const correctAnswerMatch = resultString.match(/Correct Answer:\s*([A-D])\)/);
-    const correctAnswerIndex = correctAnswerMatch
-        ? "ABCD".indexOf(correctAnswerMatch[1]) // Convert "A", "B", etc., to 0, 1, 2, 3
-        : -1;
-
-    // Extract the explanation
-    const explanationMatch = resultString.match(/Explanation:\s*(.*)/s);
-    const explanation = explanationMatch ? explanationMatch[1].trim() : "";
-
-    return {
-        question,
-        answers,
-        correctAnswer: correctAnswerIndex,
-        explanation,
-    };
-};
