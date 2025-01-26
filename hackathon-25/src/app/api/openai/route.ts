@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
         // Call OpenAI's API
         const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo', // Adjust to your OpenAI model
+            model: 'gpt-4o-mini', // Adjust to your OpenAI model
             messages: [{ role: 'user', content: prompt }],
         });
 

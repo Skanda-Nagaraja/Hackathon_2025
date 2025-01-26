@@ -48,9 +48,13 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
-      Cookies.set("token", data.token, { expires: 1 / 144});
+      Cookies.set("token", data.token, { expires: 1 / 144 });
       // Set user data in the UserContext after successful login
-      setUser({ id: data.user.id, username: data.user.username, points: data.user.totalPoints });
+      setUser({
+        id: data.user.id,
+        username: data.user.username,  // Make sure this is being set
+        points: data.user.totalPoints
+      });
       console.log(data.user)
       // Redirect to the dashboard after successful login
       router.push("/dashboard");

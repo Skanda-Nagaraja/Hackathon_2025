@@ -19,7 +19,7 @@ interface ProfileStatsProps {
             isCorrect: boolean;
             playedAt: Date;
             correctAnswer: string;
-            explaination: string;
+            explanation: string;
         }[];
     };
 }

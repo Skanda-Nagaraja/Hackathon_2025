@@ -7,9 +7,18 @@ export async function PATCH(
     { params }: { params: { username: string } }
 ) {
     try {
-        const { username } = params;
-        const { isWin } = await req.json();
+        // Wait for params to be resolved
 
+        const p = await params;
+        const username = p.username;
+        if (!username) {
+            return NextResponse.json(
+                { error: "Username is required" },
+                { status: 400 }
+            );
+        }
+
+        const { isWin } = await req.json();
         if (isWin === undefined) {
             return NextResponse.json(
                 { error: "isWin parameter is required" },

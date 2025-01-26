@@ -8,7 +8,7 @@ export interface IGameHistory {
   isCorrect: boolean;
   playedAt: Date;
   correctAnswer: string;
-  explaination: string;
+  explanation: string;
 }
 
 // Define the `IUser` interface
@@ -39,7 +39,7 @@ const GameHistorySchema = new Schema<IGameHistory>(
     isCorrect: { type: Boolean, required: true },
     playedAt: { type: Date, default: Date.now },
     correctAnswer: { type: String, required: true },
-    explaination: { type: String, required: true },
+    explanation: { type: String, required: true },
   },
   { _id: false } // Disable automatic _id for subdocuments
 );

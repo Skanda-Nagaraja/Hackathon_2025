@@ -103,7 +103,7 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
         // if (selectedAnswer !== null) {
         //     setShowFeedback(true);
         // }
-
+        console.log("User data:", user);
         if (selectedAnswer === null || !questionData) return;
 
         setLoading(true);
@@ -112,33 +112,64 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
 
         try {
             const isCorrect = selectedAnswer === questionData.correctAnswer;
+            console.log("explanation", questionData.explanation)
+          const response = await fetch("/api/game-history", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: user.username,
+                category: category,
+                question: questionData.question,
+                choices: questionData.answers,
+                chosenOption: questionData.answers[selectedAnswer],
+                isCorrect: isCorrect,
+                playedAt: new Date().toISOString(),
+                correctAnswer: questionData.answers[questionData.correctAnswer],
+                explanation: questionData.explanation,
+            }),
+          });
 
-            const response = await fetch("/api/game-history", {
-                method: "POST",
+            // Update points (add 10 points for correct answer)
+            if (isCorrect) {
+                const pointsResponse = await fetch(`/api/users/${user.username}/points`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        points: 10, // Add 10 points for correct answer
+                    }),
+                });
+
+                if (pointsResponse.ok) {
+                    const pointsData = await pointsResponse.json();
+                    // Update local user context with new points total
+                    if (user) {
+                        user.points = pointsData.user.totalPoints;
+                    }
+                }
+            }
+
+            // Update wins/games played
+            const winsResponse = await fetch(`/api/users/${user.username}/wins`, {
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    username: user.username,
-                    category: category,
-                    question: questionData.question,
-                    choices: questionData.answers,
-                    chosenOption: questionData.answers[selectedAnswer],
-                    isCorrect: isCorrect,
-                    playedAt: new Date().toISOString(),
-                    correctAnswer: questionData.answers[questionData.correctAnswer],
-                    explanation: questionData.explanation,
+                    isWin: isCorrect,
                 }),
             });
 
-            const data = await response.json();
-
             if (response.ok) {
-                console.log("Game history updated successfully:", data.message);
+                console.log("Game history updated successfully");
                 setShowFeedback(true);
             } else {
-                console.error("Error updating game history:", data.error);
-                setError(data.error || "Failed to update game history.");
+                console.error("Error updating game history");
+                console.log(response)
+                setError("Failed to update game history.");
             }
 
         } catch (error) {
@@ -341,16 +372,18 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
 
 // Helper function to parse the result string from the OpenAI API
 function parseResultString(resultString: string): QuestionData {
+    console.log(resultString)
     const questionMatch = resultString.match(/Question:\s*(.*?)(\n\n|$)/);
     const question = questionMatch ? questionMatch[1].trim() : "";
 
-    const answersMatch = resultString.match(/A\).*?\nB\).*?\nC\).*?\nD\).*/s);
-    const answers = answersMatch
-        ? answersMatch[0]
-            .split("\n")
-            .map((line) => line.replace(/^[A-D]\)\s*/, "").trim())
-        : [];
-
+    // Updated regex to specifically match A) through D) answers
+    const answers: string[] = [];
+    const answerRegex = /([A-D]\)\s*[^\n]+)/g;
+    const answerMatches = resultString.matchAll(answerRegex);
+    for (const match of answerMatches) {
+        answers.push(match[0].replace(/^[A-D]\)\s*/, "").trim());
+    }
+    console.log(answers)
     const correctAnswerMatch = resultString.match(/Correct Answer:\s*([A-D])\)/);
     const correctAnswerIndex = correctAnswerMatch
         ? "ABCD".indexOf(correctAnswerMatch[1])
@@ -358,6 +391,7 @@ function parseResultString(resultString: string): QuestionData {
 
     const explanationMatch = resultString.match(/Explanation:\s*(.*)/s);
     const explanation = explanationMatch ? explanationMatch[1].trim() : "";
+
 
     return {
         question,
