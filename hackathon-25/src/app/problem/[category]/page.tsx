@@ -211,7 +211,7 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
     const isCorrect = selectedAnswer === questionData?.correctAnswer;
 
     return (
-        <div className="min-h-screen p-4 md:p-8 bg-zinc-50 dark:bg-zinc-950">
+        <div className="min-h-screen p-4 md:p-8 bg-pink-200 dark:bg-zinc-950">
             {/* Back to Categories Button */}
             <Button
                 variant="ghost"
