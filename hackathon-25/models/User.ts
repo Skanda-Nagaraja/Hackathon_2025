@@ -5,7 +5,7 @@ export interface IUser extends Document {
   passwordHash: string;
   totalGamesPlayed?: number;
   totalWins?: number;
-  categoryStats?: Record<
+  categoryStats?: Map<
     string,
     {
       gamesPlayed: number;
