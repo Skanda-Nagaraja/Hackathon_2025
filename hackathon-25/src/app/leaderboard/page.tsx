@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Trophy, User, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-import { UserProvider, useUser } from "../UserContext"
+import { UserProvider, useUser } from "../../contexts/UserContext"
 
 import  ModeToggle  from "@/components/mode-toggle"
 
@@ -35,7 +35,6 @@ interface LeaderboardUser {
   totalPoints: number
 }
 
-// Remove duplicate export default
 const [leaderboardData, setLeaderboardData] = useState<(LeaderboardUser & { rank: number })[]>([])
 const [isLoading, setIsLoading] = useState(true)
 
@@ -76,7 +75,7 @@ const [isLoading, setIsLoading] = useState(true)
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2 text-zinc-900 dark:text-zinc-100">
             <Trophy className="w-5 h-5" />
-            <span className="font-medium">1,234 points</span>
+            <span className="font-medium">{user?.points || 0} points</span>
           </div>
 
           <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">

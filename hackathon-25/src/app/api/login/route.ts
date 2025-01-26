@@ -42,6 +42,7 @@ export async function POST(req: Request) {
         totalGamesPlayed: user.totalGamesPlayed,
         totalWins: user.totalWins,
         categoryStats: user.categoryStats,
+        totalPoints: user.totalPoints,
       },
       token, // Return the token (use something secure in production)
     });

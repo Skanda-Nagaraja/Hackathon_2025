@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
-import { UserProvider, useUser } from "../UserContext"
-import Cookies from "js-cookie"
-
+import { UserProvider, useUser } from "../../contexts/UserContext"
+import Cookies from "js-cookie";
+import { cookies } from "next/headers"
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,15 +43,15 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
-
+      console.log(data)
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
       }
 
+      Cookies.set("token", data.token, { expires: 1 / 144});
       // Set user data in the UserContext after successful login
-      Cookies.set("token", data.token, { expires: 10/1440 });
-      setUser({ id: data.user.id, username: data.user.username, points: data.user.points });
-
+      setUser({ id: data.user.id, username: data.user.username, points: data.user.totalPoints });
+      console.log(data.user)
       // Redirect to the dashboard after successful login
       router.push("/dashboard");
     } catch (error) {
