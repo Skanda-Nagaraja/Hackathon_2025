@@ -51,12 +51,12 @@ export default function ProblemPage({ params }: { params: { category: string } }
         Back to Categories
       </Button>
 
-      <Card className="max-w-2xl mx-auto border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+      <Card className="max-w-2xl mx-auto border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-slate-900 dark:text-slate-100">{category}</CardTitle>
+          <CardTitle className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{category}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="text-lg font-medium text-slate-900 dark:text-slate-100">{problem.question}</div>
+          <div className="text-lg font-medium text-zinc-900 dark:text-zinc-100">{problem.question}</div>
           <RadioGroup
             value={selectedAnswer?.toString()}
             onValueChange={(value) => setSelectedAnswer(Number.parseInt(value))}
@@ -68,14 +68,14 @@ export default function ProblemPage({ params }: { params: { category: string } }
                 className={`flex items-center space-x-2 rounded-lg border p-4 transition-colors
                   ${
                     selectedAnswer === index
-                      ? "border-slate-900 dark:border-slate-100"
-                      : "border-slate-200 dark:border-slate-700"
+                      ? "border-zinc-900 dark:border-zinc-100"
+                      : "border-zinc-200 dark:border-zinc-700"
                   }`}
               >
                 <RadioGroupItem value={index.toString()} id={`answer-${index}`} />
                 <Label
                   htmlFor={`answer-${index}`}
-                  className="flex-grow cursor-pointer text-slate-900 dark:text-slate-100"
+                  className="flex-grow cursor-pointer text-zinc-900 dark:text-zinc-100"
                 >
                   {answer}
                 </Label>
@@ -111,4 +111,3 @@ export default function ProblemPage({ params }: { params: { category: string } }
     </div>
   )
 }
-
