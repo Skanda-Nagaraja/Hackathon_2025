@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { connectToDatabase } from "@/lib/mongo";
+import jwt from "jsonwebtoken";
 import User from "../../../../models/User";
 
 export async function POST(req: Request) {
@@ -26,9 +27,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
-    // Generate a simple token (for demonstration purposes)
-    // You should use a proper authentication strategy like JWT in production
-    const token = Buffer.from(`${user.username}:${new Date().getTime()}`).toString("base64");
+    const token = jwt.sign(
+        { id: user.id, username: user.username },
+        process.env.JWT_SECRET || "secret",
+        { expiresIn: "7d" }
+      );
+  
+
 
     return NextResponse.json({
       message: "Login successful",

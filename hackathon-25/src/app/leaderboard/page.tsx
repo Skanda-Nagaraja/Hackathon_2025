@@ -4,7 +4,13 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Trophy, User, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
-import ModeToggle from "@/components/mode-toggle"
+
+import { UserProvider, useUser } from "../UserContext"
+
+import  ModeToggle  from "@/components/mode-toggle"
+
+
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   DropdownMenu,
@@ -14,6 +20,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useEffect, useState } from "react"
+
+
+
+
+
+export default function LeaderboardPage() {
+  const router = useRouter()
+  const { user } = useUser()
 
 // Define the user type
 interface LeaderboardUser {
@@ -51,6 +65,7 @@ export default function LeaderboardPage() {
     fetchLeaderboard()
   }, [])
 
+
   const handleLogout = () => {
     router.push("/")
   }
@@ -75,7 +90,7 @@ export default function LeaderboardPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
                   <User className="w-5 h-5 mr-2" />
-                  John Doe
+                  {user?.username}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
