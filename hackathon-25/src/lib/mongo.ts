@@ -11,7 +11,7 @@ interface MongooseCache {
   promise: Promise<Connection> | null;
 }
 
-let cached: MongooseCache = (global as any).mongooseCache || { conn: null, promise: null };
+const cached: MongooseCache = (global as any).mongooseCache || { conn: null, promise: null };
 (global as any).mongooseCache = cached;
 
 export async function connectToDatabase(): Promise<Connection> {

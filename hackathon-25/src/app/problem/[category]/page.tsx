@@ -1,10 +1,11 @@
 "use client";
+import React from 'react';
 
-import { use, useState } from "react";
+import {  useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-import { UserProvider, useUser } from "@/contexts/UserContext";
+import { useUser } from "@/contexts/UserContext";
 
 import {
     Card,
@@ -103,7 +104,7 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
         // if (selectedAnswer !== null) {
         //     setShowFeedback(true);
         // }
-        console.log("User data:", user);
+
         if (selectedAnswer === null || !questionData) return;
 
         setLoading(true);
@@ -153,15 +154,7 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
             }
 
             // Update wins/games played
-            const winsResponse = await fetch(`/api/users/${user.username}/wins`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    isWin: isCorrect,
-                }),
-            });
+
 
             if (response.ok) {
                 console.log("Game history updated successfully");
@@ -304,7 +297,7 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
                             </>
                         ) : (
                             <div className="text-center text-zinc-700 dark:text-zinc-300">
-                                Click "Get a New Question" to start your quiz!
+                                Click `&quot;`Get a New Question`&quot;` to start your quiz!
                             </div>
                         )}
                     </CardContent>

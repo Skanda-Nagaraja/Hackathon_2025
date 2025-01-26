@@ -1,11 +1,11 @@
 "use client"
-
+import React from 'react';
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Trophy, User, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-import { UserProvider, useUser } from "../../contexts/UserContext"
+import {  useUser } from "../../contexts/UserContext"
 
 import ModeToggle from "@/components/mode-toggle"
 

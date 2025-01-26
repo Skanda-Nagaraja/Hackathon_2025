@@ -33,7 +33,7 @@ export async function GET(
         }
 
         const { passwordHash, categoryStats, ...userData } = user.toObject();
-
+        console.log("User data:", passwordHash);
         // If categoryStats is a Map, convert it to a plain object
         const categoryStatsObject =
             categoryStats instanceof Map
