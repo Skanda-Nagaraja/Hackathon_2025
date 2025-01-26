@@ -140,13 +140,12 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        points: 10, // Add 10 points for correct answer
+                        points: 150, 
                     }),
                 });
 
                 if (pointsResponse.ok) {
                     const pointsData = await pointsResponse.json();
-                    // Update local user context with new points total
                     if (user) {
                         user.points = pointsData.user.totalPoints;
                     }
