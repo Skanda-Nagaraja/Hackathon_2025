@@ -383,46 +383,38 @@ export default function UserDashboard() {
                             <CardTitle>Problem History</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="h-[300px] overflow-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Category</TableHead>
-                                            <TableHead>Result</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {problemHistory
-                                            .slice()
-                                            .reverse()
-                                            .map((problem) => {
-                                                // Encode the timestamp to ensure it's URL-safe
-                                                const encodedTimestamp = encodeURIComponent(new Date(problem.playedAt).toISOString());
-
-                                                return (
-                                                    <TableRow key={`${problem.category}-${problem.playedAt}`} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                                                        <TableCell>
-                                                            <Link
-                                                                href={`/problem-history/${userData?.username}/${encodedTimestamp}`}
-                                                                className="hover:underline"
-                                                            >
-                                                                {problem.category}
-                                                            </Link>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <span className={problem.correct ? "text-green-600" : "text-red-600"}>
-                                                                {problem.correct ? "Correct" : "Incorrect"}
-                                                            </span>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                );
-                                            })}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4 italic">
-                                Click on a category to view the problem and solution.
-                            </p>
+                        <div className="h-[300px] overflow-auto">
+                            <Table>
+                            <TableHeader>
+                                <TableRow>
+                                <TableHead>Category</TableHead>
+                                <TableHead>Result</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {problemHistory.map((problem) => (
+                                <TableRow key={problem.id} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                                    <TableCell>
+                                    <Link
+                                        href={`/problem/${encodeURIComponent(problem.category)}`}
+                                        className=" hover:underline"
+                                    >
+                                        {problem.category}
+                                    </Link>
+                                    </TableCell>
+                                    <TableCell>
+                                    <span className={problem.correct ? "text-green-600" : "text-red-600"}>
+                                        {problem.correct ? "Correct" : "Incorrect"}
+                                    </span>
+                                    </TableCell>
+                                </TableRow>
+                                ))}
+                            </TableBody>
+                            </Table>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4 italic">
+                            Click on a category to generate a new problem
+                        </p>
                         </CardContent>
                     </Card>
 
