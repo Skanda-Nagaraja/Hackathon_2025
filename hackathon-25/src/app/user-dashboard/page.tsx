@@ -11,15 +11,19 @@ import { useUser } from "../../contexts/UserContext";
 import Link from "next/link";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+let globalTotal = 0;
+  
 
 const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const { name, value, percent } = payload[0];
+      const { name, value } = payload[0]; // Extract name and value
+      const percent = globalTotal ? (value / globalTotal) * 100 : 0; // Use globalTotal to calculate percent
+  
       return (
         <div className="bg-white p-4 border border-gray-300 rounded-2xl shadow-md">
           <p className="text-black text-sm font-bold">{name}</p>
           <p className="text-black text-xs">Games: {value}</p>
-          <p className="text-black text-xs">Percentage: {(percent * 100).toFixed(2)}%</p>
+          <p className="text-black text-xs">Percentage: {percent.toFixed(2)}%</p>
         </div>
       );
     }
@@ -29,6 +33,8 @@ const CustomTooltip = ({ active, payload }: any) => {
   
 
 export default function UserDashboard() {
+
+    
     const { user, logout } = useUser() as {
         user: { username: string } | null;
         logout: () => void;
@@ -58,6 +64,7 @@ export default function UserDashboard() {
         totalPoints: number;
     } | null>(null);
 
+
     const [loading, setLoading] = useState(true); // Loading state
     const [error, setError] = useState<string | null>(null); // Error state
 
@@ -70,6 +77,26 @@ export default function UserDashboard() {
     });
     const [problemHistory, setProblemHistory] = useState<any[]>([]);
     const [categoryData, setCategoryData] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (userData) {
+            // Calculate total games played across all categories
+            globalTotal = Object.values(userData.categoryStats).reduce(
+            (sum: number, stats: any) => sum + (stats.gamesPlayed || 0),
+            0
+            );
+        
+            // Process category data for pie chart
+            const categories = Object.keys(userData.categoryStats);
+            const catData = categories.map((category) => ({
+            name: category,
+            value: userData.categoryStats[category]?.gamesPlayed || 0,
+            }));
+        
+            console.log("Category Data for PieChart:", catData); // Debugging
+            setCategoryData(catData);
+        }
+    }, [userData]);
 
     // 1. Fetch the user’s own data (games played, points, etc.)
     useEffect(() => {
