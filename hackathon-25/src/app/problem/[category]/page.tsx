@@ -140,7 +140,7 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        points: 10, // Add 10 points for correct answer
+                        points: 150, // Add 10 points for correct answer
                     }),
                 });
 
