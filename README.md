@@ -1,4 +1,4 @@
-### MoneyMind
+# MoneyMind
 
 ## Inspiration
 The inspiration behind this app was to educate users on best financial practices in several different aspects of finance. We knew that a game with a social aspect would be a great incentive to attract users, so it came natural to us to develop a platform intersecting these two domains.
