@@ -11,7 +11,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserProvider, useUser } from "../UserContext"
+import { UserProvider, useUser } from "../../contexts/UserContext"
 import { useEffect } from "react";
 
 import { useRouter } from "next/navigation";

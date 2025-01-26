@@ -1,22 +1,23 @@
 interface ProfileStatsProps {
     userData: {
         username: string;
-        createdAt: string;
+        createdAt: Date;
         totalGamesPlayed: number;
         totalWins: number;
-        categoryStats?: {
-            [category: string]: {
-                gamesPlayed: number;
-                correctAnswers: number;
-                winPercentage: number;
-            };
-        };
+        categoryStats?: Map<
+            string,
+            {
+            gamesPlayed: number;
+            correctAnswers: number;
+            winPercentage: number;
+            }
+        >;
         gameHistory?: {
             category: string;
             question: string;
             chosenOption: string;
             isCorrect: boolean;
-            playedAt: string;
+            playedAt: Date;
         }[];
     };
 }

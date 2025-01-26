@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Trophy, User, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-import { UserProvider, useUser } from "../UserContext"
+import { UserProvider, useUser } from "../../contexts/UserContext"
 
 import  ModeToggle  from "@/components/mode-toggle"
 
