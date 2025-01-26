@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import Cookies from "js-cookie";
+import { set } from "mongoose";
 // Define UserContext
 interface UserContextType {
   user: { id: string; username: string; points: number } | null;
@@ -18,8 +19,28 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    Cookies.remove("token");
     router.push("/login");
   };
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      try {
+        const decoded = JSON.parse(atob(token.split(".")[1]));
+        const exp = (decoded.exp * 1000);
+
+        if (Date.now() < exp) {
+          setUser({ id: decoded.id, username: decoded.username, points: decoded.points });
+        } else {
+          logout();
+        }
+      } catch(error) {
+        logout();
+      }
+
+    }
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser, logout }}>

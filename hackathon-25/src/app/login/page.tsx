@@ -7,6 +7,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
 import { UserProvider, useUser } from "../UserContext"
+import Cookies from "js-cookie"
 
 
 export default function LoginPage() {
@@ -48,7 +49,8 @@ export default function LoginPage() {
       }
 
       // Set user data in the UserContext after successful login
-      setUser({ id: data.user.id, username: data.user.username });
+      Cookies.set("token", data.token, { expires: 10/1440 });
+      setUser({ id: data.user.id, username: data.user.username, points: data.user.points });
 
       // Redirect to the dashboard after successful login
       router.push("/dashboard");
