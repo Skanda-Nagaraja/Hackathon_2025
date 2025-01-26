@@ -35,7 +35,6 @@ interface LeaderboardUser {
   totalPoints: number
 }
 
-// Remove duplicate export default
 const [leaderboardData, setLeaderboardData] = useState<(LeaderboardUser & { rank: number })[]>([])
 const [isLoading, setIsLoading] = useState(true)
 

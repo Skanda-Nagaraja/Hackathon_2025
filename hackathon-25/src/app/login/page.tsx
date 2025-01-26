@@ -7,7 +7,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
 import { UserProvider, useUser } from "../../contexts/UserContext"
-
+import Cookies from "js-cookie";
+import { cookies } from "next/headers"
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,6 +48,7 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
+      Cookies.set("token", data.token, { expires: 1 / 144});
       // Set user data in the UserContext after successful login
       setUser({ id: data.user.id, username: data.user.username, points: data.user.totalPoints });
       console.log(data.user)

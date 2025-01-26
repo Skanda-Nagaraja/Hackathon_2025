@@ -113,22 +113,23 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
         try {
             const isCorrect = selectedAnswer === questionData.correctAnswer;
 
-            // Update game history
-            const gameHistoryResponse = await fetch("/api/game-history", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: user.username,
-                    category: category,
-                    question: questionData.question,
-                    choices: questionData.answers,
-                    chosenOption: questionData.answers[selectedAnswer],
-                    isCorrect: isCorrect,
-                    playedAt: new Date().toISOString(),
-                }),
-            });
+          const response = await fetch("/api/game-history", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: user.username,
+                category: category,
+                question: questionData.question,
+                choices: questionData.answers,
+                chosenOption: questionData.answers[selectedAnswer],
+                isCorrect: isCorrect,
+                playedAt: new Date().toISOString(),
+                correctAnswer: questionData.answers[questionData.correctAnswer],
+                explanation: questionData.explanation,
+            }),
+          });
 
             // Update points (add 10 points for correct answer)
             if (isCorrect) {
@@ -162,7 +163,7 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
                 }),
             });
 
-            if (gameHistoryResponse.ok) {
+            if (response.ok) {
                 console.log("Game history updated successfully");
                 setShowFeedback(true);
             } else {
@@ -392,7 +393,7 @@ function parseResultString(resultString: string): QuestionData {
 
     return {
         question,
-        answers,
+        answers: answers.slice(0, 4),
         correctAnswer: correctAnswerIndex,
         explanation,
     };
