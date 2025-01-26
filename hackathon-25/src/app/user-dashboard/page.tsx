@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"; // Added Tooltip and Legend
 import { ArrowLeft, LogOut, Trophy } from "lucide-react";
 import { useUser } from "../../contexts/UserContext";
+import Link from "next/link";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
@@ -279,45 +280,41 @@ export default function UserDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Problem History</CardTitle>
+                        <CardTitle>Problem History</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="h-[300px] overflow-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Category</TableHead>
-                                            <TableHead>Result</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {problemHistory.length > 0 ? (
-                                            problemHistory.map((problem) => (
-                                                <TableRow key={problem.id}>
-                                                    <TableCell>{problem.category}</TableCell>
-                                                    <TableCell>
-                                                        <span
-                                                            className={
-                                                                problem.correct
-                                                                    ? "text-green-600"
-                                                                    : "text-red-600"
-                                                            }
-                                                        >
-                                                            {problem.correct ? "Correct" : "Incorrect"}
-                                                        </span>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={2} className="text-center">
-                                                    No problem history available.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                        <div className="h-[300px] overflow-auto">
+                            <Table>
+                            <TableHeader>
+                                <TableRow>
+                                <TableHead>Category</TableHead>
+                                <TableHead>Result</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {problemHistory.map((problem) => (
+                                <TableRow key={problem.id} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                                    <TableCell>
+                                    <Link
+                                        href={`/problem/${encodeURIComponent(problem.category)}`}
+                                        className=" hover:underline"
+                                    >
+                                        {problem.category}
+                                    </Link>
+                                    </TableCell>
+                                    <TableCell>
+                                    <span className={problem.correct ? "text-green-600" : "text-red-600"}>
+                                        {problem.correct ? "Correct" : "Incorrect"}
+                                    </span>
+                                    </TableCell>
+                                </TableRow>
+                                ))}
+                            </TableBody>
+                            </Table>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4 italic">
+                            Click on a category to generate a new problem
+                        </p>
                         </CardContent>
                     </Card>
 
