@@ -95,7 +95,7 @@ D) Brand Preferences
 
 Correct Answer: D) Brand Preferences
 
-Explanation: Correct Answer: D, Brand Preferences. While personal preferences such as brand choices can indeed affect your spending, they do not constitute an official category in the budgeting process. All the other options like housing expenses, entertainment costs, and car payments are typical components of most personal budgets.`;
+Explination: Correct Answer: D, Brand Preferences. While personal preferences such as brand choices can indeed affect your spending, they do not constitute an official category in the budgeting process. All the other options like housing expenses, entertainment costs, and car payments are typical components of most personal budgets.`;
     };
 
     // Handle answer submission
