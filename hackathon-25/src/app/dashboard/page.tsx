@@ -27,10 +27,13 @@ export default function DashboardPage() {
             <span className="font-medium">1,234 points</span>
           </div>
 
-          <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
-            <Trophy className="w-5 h-5 mr-2" />
-            Leaderboard
-          </Button>
+          <Link href="/leaderboard">
+            <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
+                <Trophy className="w-5 h-5 mr-2" />
+                Leaderboard
+            </Button>
+          </Link>
+
 
           <div className="flex items-center space-x-4">
             <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
