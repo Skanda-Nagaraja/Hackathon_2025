@@ -46,9 +46,9 @@ export async function PATCH(
             user: {
                 username: updatedUser.username,
                 totalGamesPlayed: updatedUser.totalGamesPlayed,
-                totalWins: updatedUser.totalWins,
-                winRate: updatedUser.totalGamesPlayed > 0
-                    ? (updatedUser.totalWins / updatedUser.totalGamesPlayed * 100).toFixed(1)
+                totalWins: updatedUser.totalWins ?? 0,
+                winRate: (updatedUser?.totalGamesPlayed || 0) > 0
+                    ? ((updatedUser?.totalWins || 0) / (updatedUser?.totalGamesPlayed || 0) * 100).toFixed(1)
                     : "0.0"
             }
         });

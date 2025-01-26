@@ -59,16 +59,6 @@ const UserSchema = new Schema<IUser>(
       required: false, // Align with the interface
     },
 
-    gameHistory: [
-      {
-        category: { type: String, required: false },
-        question: { type: String, required: false },
-        choices: [{ type: String, required: false }],
-        chosenOption: { type: String, required: false },
-        isCorrect: { type: Boolean, required: false },
-        playedAt: { type: Date, default: Date.now, required: false },
-      },
-    ],
 
 
   },
