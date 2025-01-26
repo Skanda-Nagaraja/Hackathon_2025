@@ -1,42 +1,63 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "../../components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
-import { Label } from "../../components/ui/label"
-import { Input } from "../../components/ui/input"
-import { ArrowRight } from "lucide-react"
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
+import { Label } from "../../components/ui/label";
+import { Input } from "../../components/ui/input";
+import { ArrowRight } from "lucide-react";
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [username, setUsername] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     if (password !== confirmPassword) {
-      alert("Passwords don't match!")
-      setIsLoading(false)
-      return
+      setError("Passwords don't match!");
+      setIsLoading(false);
+      return;
     }
 
-    // TODO: Implement actual registration logic here
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      router.push("/login")
+      // Call the register API route
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+
+      // On successful registration, navigate to login page
+      router.push("/dashboard");
     } catch (error) {
-      console.error("Registration failed:", error)
+      setError(error instanceof Error ? error.message : "Something went wrong");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-zinc-50 dark:bg-zinc-950">
@@ -48,6 +69,13 @@ export default function RegisterPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+
+            {error && (
+              <div className="p-3 text-sm text-red-500 bg-red-100 dark:bg-red-900/20 rounded-md">
+                {error}
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -61,18 +89,8 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="border-zinc-200 dark:border-zinc-700"
-              />
-            </div>
-            <div className="space-y-2">
+
+
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -98,18 +116,18 @@ export default function RegisterPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={isLoading}
-            >
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+
               {isLoading ? "Creating account..." : "Create Account"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <p className="text-sm text-center text-zinc-600 dark:text-zinc-400">
               Already have an account?{" "}
-              <Button 
-                variant="link" 
+
+              <Button
+                variant="link"
+
                 className="p-0 h-auto font-semibold"
                 onClick={() => router.push("/login")}
               >
@@ -120,5 +138,7 @@ export default function RegisterPage() {
         </form>
       </Card>
     </div>
-  )
+
+  );
+
 }
