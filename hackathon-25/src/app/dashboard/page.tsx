@@ -4,6 +4,14 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import ModeToggle from "@/components/mode-toggle"
 import { Trophy, User, Wallet, TrendingUp, CreditCard, PiggyBank, Receipt, LineChart, Home, Shield } from "lucide-react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
+import { useRouter } from "next/navigation"
 
 const categories = [
   { name: "Budgeting", icon: Wallet },
@@ -17,6 +25,11 @@ const categories = [
 ]
 
 export default function DashboardPage() {
+  const router = useRouter()
+  const handleLogout = () => {
+    router.push("/")
+  }
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
       {/* Header */}
@@ -27,16 +40,30 @@ export default function DashboardPage() {
             <span className="font-medium">1,234 points</span>
           </div>
 
-          <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
-            <Trophy className="w-5 h-5 mr-2" />
-            Leaderboard
-          </Button>
+          <Link href="/leaderboard">
+            <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
+                <Trophy className="w-5 h-5 mr-2" />
+                Leaderboard
+            </Button>
+          </Link>
+
 
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
-              <User className="w-5 h-5 mr-2" />
-              John Doe
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
+                  <User className="w-5 h-5 mr-2" />
+                  John Doe
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Link href="/user-dashboard">User Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <ModeToggle />
           </div>
         </div>
