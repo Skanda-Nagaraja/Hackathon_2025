@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+
 import {
     Card,
     CardHeader,
@@ -14,7 +15,7 @@ import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 export default function ProblemHistoryPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-
+    console.log("searchParams", searchParams.get("problem"));
     // Retrieve problem data from the query string
     const problemString = searchParams.get("problem");
     const problem = problemString ? JSON.parse(problemString) : null;

@@ -12,29 +12,29 @@ import Link from "next/link";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 let globalTotal = 0;
-  
+
 
 const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const { name, value } = payload[0]; // Extract name and value
-      const percent = globalTotal ? (value / globalTotal) * 100 : 0; // Use globalTotal to calculate percent
-  
-      return (
-        <div className="bg-white p-4 border border-gray-300 rounded-2xl shadow-md">
-          <p className="text-black text-sm font-bold">{name}</p>
-          <p className="text-black text-xs">Games: {value}</p>
-          <p className="text-black text-xs">Percentage: {percent.toFixed(2)}%</p>
-        </div>
-      );
+        const { name, value } = payload[0]; // Extract name and value
+        const percent = globalTotal ? (value / globalTotal) * 100 : 0; // Use globalTotal to calculate percent
+
+        return (
+            <div className="bg-white p-4 border border-gray-300 rounded-2xl shadow-md">
+                <p className="text-black text-sm font-bold">{name}</p>
+                <p className="text-black text-xs">Games: {value}</p>
+                <p className="text-black text-xs">Percentage: {percent.toFixed(2)}%</p>
+            </div>
+        );
     }
-  
+
     return null;
-  };
-  
+};
+
 
 export default function UserDashboard() {
 
-    
+
     const { user, logout } = useUser() as {
         user: { username: string } | null;
         logout: () => void;
@@ -82,26 +82,26 @@ export default function UserDashboard() {
     const [lowestCategories, setLowestCategories] = useState<{ name: string; value: number }[]>([]);
 
 
-     // Advice states
-     const [advice, setAdvice] = useState<string | null>(null);
-     const [adviceLoading, setAdviceLoading] = useState<boolean>(false);
-     const [adviceError, setAdviceError] = useState<string | null>(null);
+    // Advice states
+    const [advice, setAdvice] = useState<string | null>(null);
+    const [adviceLoading, setAdviceLoading] = useState<boolean>(false);
+    const [adviceError, setAdviceError] = useState<string | null>(null);
 
     useEffect(() => {
         if (userData) {
             // Calculate total games played across all categories
             globalTotal = Object.values(userData.categoryStats).reduce(
-            (sum: number, stats: any) => sum + (stats.gamesPlayed || 0),
-            0
+                (sum: number, stats: any) => sum + (stats.gamesPlayed || 0),
+                0
             );
-        
+
             // Process category data for pie chart
             const categories = Object.keys(userData.categoryStats);
             const catData = categories.map((category) => ({
-            name: category,
-            value: userData.categoryStats[category]?.gamesPlayed || 0,
+                name: category,
+                value: userData.categoryStats[category]?.gamesPlayed || 0,
             }));
-        
+
             console.log("Category Data for PieChart:", catData); // Debugging
             setCategoryData(catData);
         }
@@ -136,6 +136,10 @@ export default function UserDashboard() {
                 // Process problem history
                 const history = data.gameHistory.map((game: any) => ({
                     id: game._id,
+                    playedAt: game.playedAt,
+                    chosenOption: game.chosenOption,
+                    question: game.question,
+                    choices: game.choices,
                     category: game.category,
                     correct: game.isCorrect,
                 }));
@@ -205,11 +209,11 @@ export default function UserDashboard() {
         fetchLeaderboard();
     }, [user]);
 
-     // two lowest
-     useEffect(() => {
-        if(categoryData.length == 0){
-          return;
-        } 
+    // two lowest
+    useEffect(() => {
+        if (categoryData.length == 0) {
+            return;
+        }
         const sorted = [...categoryData].sort((a, b) => a.value - b.value);
         const lowest2 = sorted.slice(0, 2);
         setLowestCategories(lowest2);
@@ -217,35 +221,35 @@ export default function UserDashboard() {
 
     //api helper
     const fetchAdvice = async (categories: { name: string; value: number }[]) => {
-      setAdviceLoading(true);
-      try {
-          const response = await fetch("/api/advice", {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ categories }),
-          });
-          if (!response.ok) {
-              throw new Error("Failed to fetch advice");
-          }
-          const data = await response.json();
-          setAdvice(data.advice);
-      } catch (error) {
-          console.error("Error fetching advice:", error);
-          setAdviceError("Failed to fetch advice. Please try again.");
-      } finally {
-          setAdviceLoading(false);
-      }
-  };
-    
-    
+        setAdviceLoading(true);
+        try {
+            const response = await fetch("/api/advice", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ categories }),
+            });
+            if (!response.ok) {
+                throw new Error("Failed to fetch advice");
+            }
+            const data = await response.json();
+            setAdvice(data.advice);
+        } catch (error) {
+            console.error("Error fetching advice:", error);
+            setAdviceError("Failed to fetch advice. Please try again.");
+        } finally {
+            setAdviceLoading(false);
+        }
+    };
+
+
     useEffect(() => {
-      if(lowestCategories.length == 2){
-        fetchAdvice(lowestCategories);
-      }
+        if (lowestCategories.length == 2) {
+            fetchAdvice(lowestCategories);
+        }
     }, [lowestCategories]);
-    
+
 
     const handleLogout = async () => {
         try {
@@ -287,7 +291,7 @@ export default function UserDashboard() {
         );
     }
 
-   
+
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
@@ -376,50 +380,49 @@ export default function UserDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <Card>
                         <CardHeader>
-                        <CardTitle>Problem History</CardTitle>
+                            <CardTitle>Problem History</CardTitle>
                         </CardHeader>
                         <CardContent>
-                        <div className="h-[300px] overflow-auto">
-                            <Table>
-                            <TableHeader>
-                                <TableRow>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Result</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {problemHistory.map((problem) => (
-                                <TableRow key={problem.id} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                                    <TableCell>
-                                    {/* <Link
-                                        href={`/problem/${encodeURIComponent(problem.category)}`}
-                                        className=" hover:underline"
-                                    >
-                                        {problem.category}
-                                    </Link> */}
-                                        <Link
-                                            href={{
-                                                pathname: "/problem-history", // Target problem page
-                                                query: { problem: JSON.stringify(problem) }, // Pass problem data as query
-                                            }}
-                                            className=" hover:underline"
-                                        >
-                                            {problem.category}
-                                        </Link>
-                                    </TableCell>
-                                    <TableCell>
-                                    <span className={problem.correct ? "text-green-600" : "text-red-600"}>
-                                        {problem.correct ? "Correct" : "Incorrect"}
-                                    </span>
-                                    </TableCell>
-                                </TableRow>
-                                ))}
-                            </TableBody>
-                            </Table>
-                        </div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4 italic">
-                            Click on a category to view the problem and solution.
-                        </p>
+                            <div className="h-[300px] overflow-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Category</TableHead>
+                                            <TableHead>Result</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {problemHistory
+                                            .slice()
+                                            .reverse()
+                                            .map((problem) => {
+                                                // Encode the timestamp to ensure it's URL-safe
+                                                const encodedTimestamp = encodeURIComponent(new Date(problem.playedAt).toISOString());
+
+                                                return (
+                                                    <TableRow key={`${problem.category}-${problem.playedAt}`} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                                                        <TableCell>
+                                                            <Link
+                                                                href={`/problem-history/${userData?.username}/${encodedTimestamp}`}
+                                                                className="hover:underline"
+                                                            >
+                                                                {problem.category}
+                                                            </Link>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <span className={problem.correct ? "text-green-600" : "text-red-600"}>
+                                                                {problem.correct ? "Correct" : "Incorrect"}
+                                                            </span>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4 italic">
+                                Click on a category to view the problem and solution.
+                            </p>
                         </CardContent>
                     </Card>
 
@@ -440,7 +443,7 @@ export default function UserDashboard() {
                                                 outerRadius={80}
                                                 fill="#8884d8"
                                                 dataKey="value"
-                                                // label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                                            // label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                                             >
                                                 {categoryData.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

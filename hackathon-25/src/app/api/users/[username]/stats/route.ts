@@ -33,7 +33,6 @@ export async function GET(
         }
 
         const { passwordHash, categoryStats, ...userData } = user.toObject();
-        console.log("User data:", passwordHash);
         // If categoryStats is a Map, convert it to a plain object
         const categoryStatsObject =
             categoryStats instanceof Map
@@ -46,7 +45,6 @@ export async function GET(
             categoryStats: categoryStatsObject,
         };
 
-        console.log("User data:", responseData);
 
         return NextResponse.json(responseData, { status: 200 });
     } catch (error) {
