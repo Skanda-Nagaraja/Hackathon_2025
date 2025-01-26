@@ -42,7 +42,7 @@ export default function DashboardPage() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
+        <div className="min-h-screen bg-pink-200 dark:bg-zinc-950 flex flex-col">
             {/* Header */}
             <header className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -85,9 +85,9 @@ export default function DashboardPage() {
             {/* Main Content */}
             <main className="flex-1 flex items-center justify-center p-4">
                 <div className="max-w-5xl w-full">
-                    <h1 className="text-3xl font-bold text-center mb-12 text-zinc-900 dark:text-zinc-100">
-                        Financial Literacy Challenge
-                    </h1>
+                <h1 className="text-4xl md:text-5xl font-bold text-center mb-12 text-zinc-900 dark:text-zinc-100">
+                    Choose A Problem Category ⬇️
+                </h1>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {categories.map((category, index) => (
