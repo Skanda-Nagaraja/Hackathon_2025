@@ -9,10 +9,14 @@ import Image from "next/image"
 import { useState } from "react"
 import { useUser } from "../../contexts/UserContext"
 import Cookies from "js-cookie";
+import { useTheme } from "next-themes"
+
 //import { cookies } from "next/headers"
 
 export default function LoginPage() {
   const router = useRouter();
+  const { theme } = useTheme()
+
   // Accessed setUser from useUser to set the logged-in user's data after a successful login
   const { setUser } = useUser();
 
@@ -21,8 +25,14 @@ export default function LoginPage() {
     username: "",
     password: "",
   });
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const imageSrc =
+    theme === "dark"
+      ? "/images/background.jpg"
+      : "/images/pig.png"
 
   // Added handleChange to update form state
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,12 +82,12 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left side - Login form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-zinc-900">
+      <div className="flex-1 flex items-center justify-center p-8 bg-pink-200 dark:bg-zinc-900">
         <div className="max-w-sm w-full">
-          <Link href="/" className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-8 block">
-            MoneyMind
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight mb-8 text-zinc-900 dark:text-zinc-100">Welcome back</h1>
+          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-8 block">
+            MoneyMind 
+          </h1>
+          <h1 className="text-2xl tracking-tight mb-8 text-zinc-900 dark:text-zinc-100">Welcome back</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="p-3 text-sm text-red-500 bg-red-100 dark:bg-red-900/20 rounded-md">
@@ -140,11 +150,12 @@ export default function LoginPage() {
       {/* Right side - Image background */}
       <div className="hidden lg:block lg:flex-1 relative">
         <Image
-          src="/images/background.jpg"
+          src={imageSrc || "/placeholder.svg"}
           alt="Financial literacy concept"
           layout="fill"
           objectFit="cover"
           priority
+          className="transition-opacity duration-300 ease-in-out"
         />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-end p-12">
           <blockquote className="text-lg font-medium text-white max-w-lg">
