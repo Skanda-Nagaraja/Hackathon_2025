@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
 import { ArrowLeft, LogOut, Trophy } from "lucide-react"
+import Link from "next/link"
 
 // Mock data for the problem history
 const problemHistory = [
@@ -114,8 +115,15 @@ export default function UserDashboard() {
                   </TableHeader>
                   <TableBody>
                     {problemHistory.map((problem) => (
-                      <TableRow key={problem.id}>
-                        <TableCell>{problem.category}</TableCell>
+                      <TableRow key={problem.id} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                        <TableCell>
+                          <Link
+                            href={`/problem/${encodeURIComponent(problem.category)}`}
+                            className="hover:underline"
+                          >
+                            {problem.category}
+                          </Link>
+                        </TableCell>
                         <TableCell>
                           <span className={problem.correct ? "text-green-600" : "text-red-600"}>
                             {problem.correct ? "Correct" : "Incorrect"}
@@ -126,6 +134,9 @@ export default function UserDashboard() {
                   </TableBody>
                 </Table>
               </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4 italic">
+                Click on a category to generate a new problem
+              </p>
             </CardContent>
           </Card>
 
