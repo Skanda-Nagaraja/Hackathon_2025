@@ -297,7 +297,7 @@ Explination: Correct Answer: D, Brand Preferences. While personal preferences su
                             </>
                         ) : (
                             <div className="text-center text-zinc-700 dark:text-zinc-300">
-                                Click `&quot;`Get a New Question`&quot;` to start your quiz!
+                                Click "Get a New Question" to start your quiz!
                             </div>
                         )}
                     </CardContent>
