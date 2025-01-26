@@ -42,14 +42,14 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
-
+      console.log(data)
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
       }
 
       // Set user data in the UserContext after successful login
-      setUser({ id: data.user.id, username: data.user.username });
-
+      setUser({ id: data.user.id, username: data.user.username, points: data.user.totalPoints });
+      console.log(data.user)
       // Redirect to the dashboard after successful login
       router.push("/dashboard");
     } catch (error) {

@@ -4,10 +4,10 @@ import User from "../../../../../../models/User";
 
 export async function PATCH(
     req: Request,
-    { params }: { params: { username: string } }
+    context: { params: { username: string } }
 ) {
     try {
-        const { username } = params;
+        const username = context.params.username;
         const { points } = await req.json();
 
         if (points === undefined) {
@@ -37,7 +37,7 @@ export async function PATCH(
             message: "Points updated successfully",
             user: {
                 username: updatedUser.username,
-                totalWins: updatedUser.totalWins,
+                totalPoints: updatedUser.totalPoints,
             }
         });
     } catch (error) {
@@ -47,4 +47,35 @@ export async function PATCH(
             { status: 500 }
         );
     }
-} 
+}
+export async function GET(
+    req: Request,
+    context: { params: { username: string } }
+) {
+    try {
+        const username =  context.params.username;
+
+        await connectToDatabase();
+
+        const user = await User.findOne({ username });
+
+        if (!user) {
+            return NextResponse.json(
+                { error: "User not found" },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json({
+            username: user.username,
+            totalPoints: user.totalPoints || 0
+        });
+
+    } catch (error) {
+        console.error("Error fetching points:", error);
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
+        );
+    }
+}
