@@ -132,4 +132,3 @@ export default function ProblemPage({ params }: { params: { category: string } }
     </div>
   )
 }
-
