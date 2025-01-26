@@ -99,7 +99,7 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
                 <Card className="border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
                     <CardHeader>
                         <CardTitle className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-                            {questionData ? `Quiz Question - ${category}` : "Start a Quiz"}
+                            {questionData ? `Quiz Question - ${category}` : "Start a " + category + " Quiz"}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
