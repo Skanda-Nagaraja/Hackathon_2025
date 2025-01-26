@@ -4,11 +4,11 @@ import User from "../../../../models/User";
 
 export async function POST(req: Request){
     try {
-        const { username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explaination } = await req.json();
+        const { username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explanation } = await req.json();
 
-        if (!username || !category || !question || !choices || chosenOption === undefined || isCorrect === undefined || !playedAt || correctAnswer === undefined || explaination === undefined) {
+        if (!username || !category || !question || !choices || chosenOption === undefined || isCorrect === undefined || !playedAt || correctAnswer === undefined || explanation === undefined) {
             return NextResponse.json(
-                { error: "All fields (username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explaination) are required" },
+                { error: "All fields (username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explanation) are required" },
                 { status: 400 }
             );
         }
@@ -33,7 +33,7 @@ export async function POST(req: Request){
             isCorrect,
             playedAt,
             correctAnswer,
-            explaination,
+            explanation,
         };
 
         // console.log("New game history entry:", newGameHistoryEntry);
