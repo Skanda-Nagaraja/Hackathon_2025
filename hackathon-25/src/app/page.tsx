@@ -2,34 +2,34 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { useState } from "react"
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router = useRouter()
 
   // State management for the form
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
+    const { id, value } = e.target
     setFormData((prev) => ({
       ...prev,
       [id]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
 
     try {
       const response = await fetch("/api/login", {
@@ -38,41 +38,31 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+        throw new Error(data.error || "Login failed")
       }
 
-      router.push("/dashboard");
+      router.push("/dashboard")
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Something went wrong");
+      setError(error instanceof Error ? error.message : "Something went wrong")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
-  
+  }
+
   return (
     <div className="flex min-h-screen">
-      <div className="hidden lg:flex lg:flex-1 bg-zinc-900 text-white p-12 relative flex-col justify-between">
-        <div>
-          <Link href="/" className="text-xl font-bold">
+      {/* Left side - Login form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-zinc-900">
+        <div className="max-w-sm w-full">
+          <Link href="/" className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-8 block">
             MoneyMind
           </Link>
-        </div>
-        <div className="max-w-md">
-          <blockquote className="text-lg font-medium mb-4">
-            "An investment in knowledge pays the best interest."
-          </blockquote>
-          <cite className="text-zinc-400">Benjamin Franklin</cite>
-        </div>
-      </div>
-  
-      <div className="flex-1 flex items-center justify-center p-8 bg-zinc-950">
-        <div className="max-w-sm w-full">
-          <h1 className="text-2xl font-semibold tracking-tight mb-8 text-center text-white">Welcome back</h1>
+          <h1 className="text-2xl font-semibold tracking-tight mb-8 text-zinc-900 dark:text-zinc-100">Welcome back</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="p-3 text-sm text-red-500 bg-red-100 dark:bg-red-900/20 rounded-md">
@@ -82,7 +72,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label
                 htmlFor="username"
-                className="text-sm font-medium leading-none text-zinc-600 dark:text-zinc-400 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-zinc-900 dark:text-zinc-100"
               >
                 Username
               </label>
@@ -101,7 +91,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-medium leading-none text-zinc-600 dark:text-zinc-400 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-zinc-900 dark:text-zinc-100"
               >
                 Password
               </label>
@@ -131,6 +121,23 @@ export default function LoginPage() {
           </form>
         </div>
       </div>
+
+      {/* Right side - Image background */}
+      <div className="hidden lg:block lg:flex-1 relative">
+        <Image
+          src="/images/background.jpg"
+          alt="Financial literacy concept"
+          layout="fill"
+          objectFit="cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-end p-12">
+          <blockquote className="text-lg font-medium text-white max-w-lg">
+            "An investment in knowledge pays the best interest."
+            <footer className="mt-2 text-sm text-zinc-300">Benjamin Franklin</footer>
+          </blockquote>
+        </div>
+      </div>
     </div>
-  );  
+  )
 }
