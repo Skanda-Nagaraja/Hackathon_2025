@@ -1,9 +1,18 @@
 "use client"
 
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Trophy, User, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import  ModeToggle  from "@/components/mode-toggle"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
 
 // Mock data for the leaderboard
 const leaderboardData = [
@@ -27,6 +36,10 @@ const leaderboardData = [
 export default function LeaderboardPage() {
   const router = useRouter()
 
+  const handleLogout = () => {
+    router.push("/")
+  }
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
       {/* Header */}
@@ -43,10 +56,22 @@ export default function LeaderboardPage() {
           </Button>
 
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
-              <User className="w-5 h-5 mr-2" />
-              John Doe
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
+                  <User className="w-5 h-5 mr-2" />
+                  John Doe
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Link href="/user-dashboard">User Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ModeToggle />
           </div>
         </div>
       </header>
