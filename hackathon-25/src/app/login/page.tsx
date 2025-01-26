@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
-import { UserProvider, useUser } from "../UserContext"
+import { UserProvider, useUser } from "../../contexts/UserContext"
 
 
 export default function LoginPage() {

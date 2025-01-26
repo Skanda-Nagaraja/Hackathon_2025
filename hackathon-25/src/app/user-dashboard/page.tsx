@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import ProfileStats from '@/components/ui/ProfileStats'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Home, GamepadIcon } from 'lucide-react'
-import { UserProvider, useUser } from "../UserContext"
+import { UserProvider, useUser } from "@/contexts/UserContext"
 
 
 export default function UserDashboardPage() {

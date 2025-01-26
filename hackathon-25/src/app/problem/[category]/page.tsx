@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { UserProvider, useUser } from "@/contexts/UserContext";
+
 import {
     Card,
     CardHeader,
@@ -24,6 +27,15 @@ interface QuestionData {
 export default function ProblemPage() {
     const router = useRouter();
     const params = useParams();
+    const { user } = useUser();
+
+    useEffect(() => {
+      if (!user) {
+        router.push("/login");
+      }
+    }, [user, router]);
+  
+    if (!user) return null;
 
     // Safely handle `params.category` and ensure it's a string
     const category = decodeURIComponent(
@@ -87,10 +99,54 @@ Explanation: Correct Answer: D, Brand Preferences. While personal preferences su
     };
 
     // Handle answer submission
-    const handleSubmit = () => {
-        if (selectedAnswer !== null) {
-            setShowFeedback(true);
+    const handleSubmit = async () => {
+        // if (selectedAnswer !== null) {
+        //     setShowFeedback(true);
+        // }
+
+        if (selectedAnswer === null || !questionData) return;
+
+        setLoading(true);
+        setShowFeedback(false);
+        setError(null);
+
+        try {
+          const isCorrect = selectedAnswer === questionData.correctAnswer;
+
+          const response = await fetch("/api/game-history", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: user.username,
+                category: category,
+                question: questionData.question,
+                choices: questionData.answers,
+                chosenOption: questionData.answers[selectedAnswer],
+                isCorrect: isCorrect,
+                playedAt: new Date().toISOString(),
+            }),
+          });
+
+          const data = await response.json();
+          
+          if (response.ok) {
+              console.log("Game history updated successfully:", data.message);
+              setShowFeedback(true);
+          } else {
+              console.error("Error updating game history:", data.error);
+              setError(data.error || "Failed to update game history.");
+          }
+
+        } catch (error) {
+            console.error("Error:", error);
+            setError("An unexpected error occurred.");
+        } finally {
+            setLoading(false);
         }
+
+
     };
 
     // Handle fetching the next question
