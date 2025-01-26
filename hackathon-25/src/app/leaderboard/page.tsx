@@ -69,7 +69,7 @@ export default function LeaderboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
+        <div className="min-h-screen bg-pink-200 dark:bg-zinc-950 flex flex-col">
             {/* Header */}
             <header className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -141,7 +141,7 @@ export default function LeaderboardPage() {
                                     </TableRow>
                                 ) : (
                                     leaderboardData.map((entry) => (
-                                        <TableRow key={entry.username} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                                        <TableRow key={entry.username} className="bg-zinc-50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
                                             <TableCell className="font-medium">
                                                 {entry.rank === 1 && "🥇"}
                                                 {entry.rank === 2 && "🥈"}

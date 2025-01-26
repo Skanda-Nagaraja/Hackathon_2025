@@ -72,10 +72,10 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left side - Login form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-zinc-900">
+      <div className="flex-1 flex items-center justify-center p-8 bg-pink-200 dark:bg-zinc-900">
         <div className="max-w-sm w-full">
-          <Link href="/" className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-8 block">
-            MoneyMind
+          <Link href="/" className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-8 block font-orbitron">
+            MoneyMind 
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight mb-8 text-zinc-900 dark:text-zinc-100">Welcome back</h1>
           <form onSubmit={handleSubmit} className="space-y-4">

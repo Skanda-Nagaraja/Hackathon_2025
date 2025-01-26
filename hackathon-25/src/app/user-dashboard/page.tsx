@@ -290,7 +290,7 @@ export default function UserDashboard() {
    
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
+        <div className="min-h-screen bg-pink-200 dark:bg-zinc-950 p-8">
             <div className="max-w-6xl mx-auto space-y-8">
                 {/* Navigation Buttons */}
                 <div className="flex justify-between items-center">
@@ -316,7 +316,7 @@ export default function UserDashboard() {
                 </div>
 
                 <h1 className="text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">
-                    Hello, {userData?.username || "Guest"}
+                    Hello, {userData?.username || "Guest"} 😁
                 </h1>
 
                 <div className="grid gap-8 md:grid-cols-2">
