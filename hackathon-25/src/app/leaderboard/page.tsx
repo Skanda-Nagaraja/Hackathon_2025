@@ -35,10 +35,9 @@ interface LeaderboardUser {
   totalPoints: number
 }
 
-export default function LeaderboardPage() {
-  const router = useRouter()
-  const [leaderboardData, setLeaderboardData] = useState<(LeaderboardUser & { rank: number })[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+// Remove duplicate export default
+const [leaderboardData, setLeaderboardData] = useState<(LeaderboardUser & { rank: number })[]>([])
+const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -162,5 +161,5 @@ export default function LeaderboardPage() {
       </main>
     </div>
   )
-}
 
+}

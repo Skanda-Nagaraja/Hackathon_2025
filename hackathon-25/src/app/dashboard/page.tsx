@@ -29,6 +29,7 @@ const categories = [
 
 export default function DashboardPage() {
     const { user, logout } = useUser(); // Get the user and logout function from UserContext
+    console.log(user)
     const router = useRouter();
   
     useEffect(() => {
