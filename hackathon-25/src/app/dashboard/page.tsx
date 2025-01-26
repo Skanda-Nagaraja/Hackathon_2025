@@ -31,13 +31,13 @@ export default function DashboardPage() {
     const { user, logout } = useUser(); // Get the user and logout function from UserContext
     console.log(user)
     const router = useRouter();
-  
+
     useEffect(() => {
-      if (!user) {
-        router.push("/login"); // Redirect to login if the user is not authenticated
-      }
+        if (!user) {
+            router.push("/login"); // Redirect to login if the user is not authenticated
+        }
     }, [user, router]);
-  
+
     if (!user) return null;
 
     return (
@@ -47,7 +47,7 @@ export default function DashboardPage() {
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-zinc-900 dark:text-zinc-100">
                         <Trophy className="w-5 h-5" />
-                        <span className="font-medium">{user.points } points</span>
+                        <span className="font-medium">{user.points} points</span>
                     </div>
 
                     <Link href="/leaderboard">
@@ -62,7 +62,7 @@ export default function DashboardPage() {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
                                     <User className="w-5 h-5 mr-2" />
-                                    {user?.username }
+                                    {user?.username}
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -70,7 +70,10 @@ export default function DashboardPage() {
                                     <Link href="/user-dashboard">User Dashboard</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                                {/* Logout styled in red */}
+                                <DropdownMenuItem onClick={logout} className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900">
+                                    Logout
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                         <ModeToggle />
