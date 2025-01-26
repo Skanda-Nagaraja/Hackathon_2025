@@ -5,29 +5,31 @@ import { useRouter } from 'next/navigation'
 import ProfileStats from '@/components/ui/ProfileStats'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Home, GamepadIcon } from 'lucide-react'
-import { IUser } from '../../../models/User'
+import { UserProvider, useUser } from "../UserContext"
+
 
 export default function UserDashboardPage() {
-  const router = useRouter()
-  const [userData, setUserData] = useState<IUser | null>(null)
-
-  useEffect(() => {
-    // Fetch user data when component mounts
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('/api/users')
-        if (response.ok) {
-          const data = await response.json()
-          // For demo purposes, getting first user. In real app, you'd get specific user
-          setUserData(data[1])
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error)
+    const { user, logout } = useUser() as { 
+      user: {
+        username: string;
+        createdAt: Date;
+        totalGamesPlayed: number;
+        totalWins: number;
+        categoryStats: Map<string, any>;
+        gameHistory: any[];
+      } | null;
+      logout: () => void;
+    }; // Get the user and logout function from UserContext
+    const router = useRouter();
+  
+    useEffect(() => {
+      if (!user) {
+        router.push("/login"); // Redirect to login if the user is not authenticated
       }
-    }
-
-    fetchUserData()
-  }, [])
+    }, [user, router]);
+  
+    if (!user) return null; // Avoid rendering while redirecting
+  
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col p-8">
@@ -65,8 +67,8 @@ export default function UserDashboardPage() {
         User Dashboard
       </h1>
 
-      <ProfileStats userData={userData} />
+      <ProfileStats userData={user} />
     </div>
   )
-}
+};
 

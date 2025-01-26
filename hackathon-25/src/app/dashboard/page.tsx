@@ -11,6 +11,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UserProvider, useUser } from "../UserContext"
+import { useEffect } from "react";
+
 import { useRouter } from "next/navigation";
 
 const categories = [
@@ -25,11 +28,16 @@ const categories = [
 ];
 
 export default function DashboardPage() {
+    const { user, logout } = useUser(); // Get the user and logout function from UserContext
     const router = useRouter();
-
-    const handleLogout = () => {
-        router.push("/");
-    };
+  
+    useEffect(() => {
+      if (!user) {
+        router.push("/login"); // Redirect to login if the user is not authenticated
+      }
+    }, [user, router]);
+  
+    if (!user) return null;
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
@@ -53,7 +61,7 @@ export default function DashboardPage() {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="text-zinc-900 dark:text-zinc-100">
                                     <User className="w-5 h-5 mr-2" />
-                                    John Doe
+                                    {user?.username }
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -61,7 +69,7 @@ export default function DashboardPage() {
                                     <Link href="/user-dashboard">User Dashboard</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                         <ModeToggle />
