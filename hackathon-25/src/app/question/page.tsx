@@ -31,13 +31,17 @@ export default function QuestionPage() {
                 },
                 body: JSON.stringify({
                     prompt:
-                        "Generate a multiple-choice question about budgeting with four answers. Include the correct answer index and an explanation in JSON format.",
+                        "Generate a multiple-choice question about budgeting with four answer choices, but only one correct answer. Include the correct answer index and an explanation. In the explanation, include the correct answer." +
+                        "Use this example to format your responses." + 
+                        "Question: Which of the following is not a component of a comprehensive personal budget?\n\nA) Housing Expenses\nB) Entertainment Costs\nC) Car Payment\nD) Brand Preferences\n\nCorrect Answer: D) Brand Preferences\n\nExplanation: Correct Answer: D. Brand Preferences. While personal preferences such as brand choices can indeed affect your spending, they do not constitute an official category in the budgeting process. All the other options like housing expenses, entertainment costs, and car payments are typical components of most personal budgets."
+                        
                 }),
             });
 
             const data = await response.json();
             if (response.ok) {
-                const parsedData = JSON.parse(data.result);
+                // Parse the OpenAI response
+                const parsedData = parseResultString(data.result); // Use the parsing function
                 setQuestionData(parsedData);
             } else {
                 console.error("Error fetching question:", data.error);
@@ -46,11 +50,16 @@ export default function QuestionPage() {
             console.error("Error:", error);
         } finally {
             setLoading(false);
+            updateRadioGroup(); // Reset the RadioGroup state
         }
     };
 
     const handleSubmit = () => {
         setShowFeedback(true);
+    };
+
+    const updateRadioGroup = () => {
+        setSelectedAnswer(null); // Reset the selected answer
     };
 
     const isCorrect = selectedAnswer === questionData?.correctAnswer;
@@ -76,15 +85,19 @@ export default function QuestionPage() {
                             onValueChange={(value) => setSelectedAnswer(Number(value))}
                             className="space-y-4"
                         >
-                            {questionData.answers.map((answer, index) => (
+                            {questionData.answers.slice(0, 4).map((answer, index) => (
                                 <div
                                     key={index}
-                                    className={`flex items-center space-x-2 rounded-lg border p-4 transition-colors ${selectedAnswer === index
+                                    className={`flex items-center space-x-2 rounded-lg border p-4 transition-colors ${
+                                        selectedAnswer === index
                                             ? "border-blue-500"
                                             : "border-gray-300"
-                                        }`}
+                                    }`}
                                 >
-                                    <RadioGroupItem value={index.toString()} id={`answer-${index}`} />
+                                    <RadioGroupItem
+                                        value={index.toString()}
+                                        id={`answer-${index}`}
+                                    />
                                     <Label htmlFor={`answer-${index}`} className="flex-grow">
                                         {answer}
                                     </Label>
@@ -93,16 +106,24 @@ export default function QuestionPage() {
                         </RadioGroup>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-4">
-                        <Button onClick={handleSubmit} disabled={selectedAnswer === null || showFeedback}>
+                        <Button
+                            onClick={handleSubmit}
+                            disabled={selectedAnswer === null || showFeedback}
+                        >
                             Submit Answer
                         </Button>
 
                         {showFeedback && (
                             <div
-                                className={`mt-6 p-4 rounded-lg ${isCorrect ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                                    }`}
+                                className={`mt-6 p-4 rounded-lg ${
+                                    isCorrect
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-red-100 text-red-800"
+                                }`}
                             >
-                                <p className="font-medium">{isCorrect ? "Correct!" : "Incorrect"}</p>
+                                <p className="font-medium">
+                                    {isCorrect ? "Correct!" : "Incorrect"}
+                                </p>
                                 <p className="mt-2">{questionData.explanation}</p>
                             </div>
                         )}
@@ -112,3 +133,35 @@ export default function QuestionPage() {
         </div>
     );
 }
+
+// Helper function to parse the result string from the OpenAI API
+const parseResultString = (resultString: string) => {
+    // Extract the question
+    const questionMatch = resultString.match(/Question:\s*(.*?)(\n\n|$)/);
+    const question = questionMatch ? questionMatch[1].trim() : "";
+
+    // Extract the answers (assumes answers are in the format A) ...\nB) ...\n)
+    const answersMatch = resultString.match(/A\).*?\nB\).*?\nC\).*?\nD\).*/s);
+    const answers = answersMatch
+        ? answersMatch[0]
+              .split("\n") // Split by lines
+              .map((line) => line.replace(/^[A-D]\)\s*/, "").trim()) // Remove "A) ", "B) ", etc.
+        : [];
+
+    // Extract the correct answer (e.g., "Correct Answer: D)")
+    const correctAnswerMatch = resultString.match(/Correct Answer:\s*([A-D])\)/);
+    const correctAnswerIndex = correctAnswerMatch
+        ? "ABCD".indexOf(correctAnswerMatch[1]) // Convert "A", "B", etc., to 0, 1, 2, 3
+        : -1;
+
+    // Extract the explanation
+    const explanationMatch = resultString.match(/Explanation:\s*(.*)/s);
+    const explanation = explanationMatch ? explanationMatch[1].trim() : "";
+
+    return {
+        question,
+        answers,
+        correctAnswer: correctAnswerIndex,
+        explanation,
+    };
+};
