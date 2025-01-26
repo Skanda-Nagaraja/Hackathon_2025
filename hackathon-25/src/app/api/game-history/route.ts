@@ -70,6 +70,18 @@ export async function POST(req: Request){
 
         await user.save();
 
+        // const savedUser = await user.save();
+
+        // if (!savedUser) {
+        //     return NextResponse.json({ error: "Error saving user game history" }, { status: 500 });
+        // }
+
+        // if (!savedUser.gameHistory) {
+        //     return NextResponse.json({ error: "Error saving user game history" }, { status: 500 });
+        // }
+
+        // console.log("Saved user game history:", savedUser.gameHistory[savedUser.gameHistory.length - 1]);
+
         return NextResponse.json({ message: "Game history added successfully", user }, { status: 200 });
     } catch (error) {
         console.error("Error in add game history route:", error);
