@@ -12,6 +12,22 @@ import Link from "next/link";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
+const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const { name, value, percent } = payload[0];
+      return (
+        <div className="bg-white p-4 border border-gray-300 rounded-2xl shadow-md">
+          <p className="text-black text-sm font-bold">{name}</p>
+          <p className="text-black text-xs">Games: {value}</p>
+          <p className="text-black text-xs">Percentage: {(percent * 100).toFixed(2)}%</p>
+        </div>
+      );
+    }
+  
+    return null;
+  };
+  
+
 export default function UserDashboard() {
     const { user, logout } = useUser() as {
         user: { username: string } | null;
@@ -335,16 +351,13 @@ export default function UserDashboard() {
                                                 outerRadius={80}
                                                 fill="#8884d8"
                                                 dataKey="value"
-                                                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                                                // label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                                             >
                                                 {categoryData.map((entry, index) => (
-                                                    <Cell
-                                                        key={`cell-${index}`}
-                                                        fill={COLORS[index % COLORS.length]}
-                                                    />
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip /> {/* Added Tooltip */}
+                                            <Tooltip content={<CustomTooltip />} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
