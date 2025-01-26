@@ -4,8 +4,8 @@ import React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { set } from "mongoose";
-import { Console } from "console";
+// import { set } from "mongoose";
+// import { Console } from "console";
 // Define UserContext
 interface UserContextType {
   user: { id: string; username: string; points: number } | null;

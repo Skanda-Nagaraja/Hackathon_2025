@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserProvider, useUser } from "../../contexts/UserContext"
+import {  useUser } from "../../contexts/UserContext"
 import { useEffect } from "react";
 
 import { useRouter } from "next/navigation";

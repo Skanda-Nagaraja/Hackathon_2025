@@ -1,5 +1,5 @@
 
-import { NextApiRequest, NextApiResponse } from "next";
+//import { NextApiRequest, NextApiResponse } from "next";
 import { connectToDatabase } from "@/lib/mongo";
 import User from "../../../../models/User";
 import { NextResponse } from "next/server";

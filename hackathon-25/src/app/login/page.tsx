@@ -1,4 +1,5 @@
 "use client"
+import React from 'react';
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,9 +7,9 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
-import { UserProvider, useUser } from "../../contexts/UserContext"
+import { useUser } from "../../contexts/UserContext"
 import Cookies from "js-cookie";
-import { cookies } from "next/headers"
+//import { cookies } from "next/headers"
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,9 +49,13 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
-      Cookies.set("token", data.token, { expires: 1 / 144});
+      Cookies.set("token", data.token, { expires: 1 / 144 });
       // Set user data in the UserContext after successful login
-      setUser({ id: data.user.id, username: data.user.username, points: data.user.totalPoints });
+      setUser({
+        id: data.user.id,
+        username: data.user.username,  // Make sure this is being set
+        points: data.user.totalPoints
+      });
       console.log(data.user)
       // Redirect to the dashboard after successful login
       router.push("/dashboard");
@@ -120,7 +125,7 @@ export default function LoginPage() {
             </Button>
             <div className="mt-4 text-center">
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Don't have an account?{" "}
+                Don`&apos;`t have an account?{" "}
                 <Link href="/register">
                   <Button variant="link" className="p-0 h-auto font-semibold text-blue-500">
                     Sign Up
@@ -143,7 +148,7 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-end p-12">
           <blockquote className="text-lg font-medium text-white max-w-lg">
-            "An investment in knowledge pays the best interest."
+          `&quot;`An investment in knowledge pays the best interest.`&quot;`
             <footer className="mt-2 text-sm text-zinc-300">Benjamin Franklin</footer>
           </blockquote>
         </div>

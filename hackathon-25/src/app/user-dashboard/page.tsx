@@ -79,6 +79,13 @@ export default function UserDashboard() {
     });
     const [problemHistory, setProblemHistory] = useState<any[]>([]);
     const [categoryData, setCategoryData] = useState<any[]>([]);
+    const [lowestCategories, setLowestCategories] = useState<{ name: string; value: number }[]>([]);
+
+
+     // Advice states
+     const [advice, setAdvice] = useState<string | null>(null);
+     const [adviceLoading, setAdviceLoading] = useState<boolean>(false);
+     const [adviceError, setAdviceError] = useState<string | null>(null);
 
     useEffect(() => {
         if (userData) {
@@ -198,6 +205,48 @@ export default function UserDashboard() {
         fetchLeaderboard();
     }, [user]);
 
+     // two lowest
+     useEffect(() => {
+        if(categoryData.length == 0){
+          return;
+        } 
+        const sorted = [...categoryData].sort((a, b) => a.value - b.value);
+        const lowest2 = sorted.slice(0, 2);
+        setLowestCategories(lowest2);
+    }, [categoryData]);
+
+    //api helper
+    const fetchAdvice = async (categories: { name: string; value: number }[]) => {
+      setAdviceLoading(true);
+      try {
+          const response = await fetch("/api/advice", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ categories }),
+          });
+          if (!response.ok) {
+              throw new Error("Failed to fetch advice");
+          }
+          const data = await response.json();
+          setAdvice(data.advice);
+      } catch (error) {
+          console.error("Error fetching advice:", error);
+          setAdviceError("Failed to fetch advice. Please try again.");
+      } finally {
+          setAdviceLoading(false);
+      }
+  };
+    
+    
+    useEffect(() => {
+      if(lowestCategories.length == 2){
+        fetchAdvice(lowestCategories);
+      }
+    }, [lowestCategories]);
+    
+
     const handleLogout = async () => {
         try {
             await logout();
@@ -237,6 +286,8 @@ export default function UserDashboard() {
             </div>
         );
     }
+
+   
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
@@ -421,11 +472,19 @@ export default function UserDashboard() {
                                 <CardTitle>Advice</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-zinc-700 dark:text-zinc-300">
-                                    Based on your performance, we recommend focusing more on
-                                    Investments and Taxes. Try to allocate more time to these
-                                    categories to improve your overall financial literacy.
-                                </p>
+                                {adviceLoading ? (
+                                    <p className="text-zinc-700 dark:text-zinc-300">Generating advice...</p>
+                                ) : adviceError ? (
+                                    <p className="text-red-500">{adviceError}</p>
+                                ) : advice ? (
+                                    <p className="text-zinc-700 dark:text-zinc-300 whitespace-pre-line">
+                                        {advice}
+                                    </p>
+                                ) : (
+                                    <p className="text-zinc-700 dark:text-zinc-300">
+                                        Based on your performance, we recommend focusing more on the identified categories.
+                                    </p>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
