@@ -4,11 +4,11 @@ import User from "../../../../models/User";
 
 export async function POST(req: Request){
     try {
-        const { username, category, question, choices, chosenOption, isCorrect, playedAt } = await req.json();
+        const { username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explaination } = await req.json();
 
-        if (!username || !category || !question || !choices || chosenOption === undefined || isCorrect === undefined || !playedAt) {
+        if (!username || !category || !question || !choices || chosenOption === undefined || isCorrect === undefined || !playedAt || correctAnswer === undefined || explaination === undefined) {
             return NextResponse.json(
-                { error: "All fields (username, category, question, choices, chosenOption, isCorrect, playedAt) are required" },
+                { error: "All fields (username, category, question, choices, chosenOption, isCorrect, playedAt, correctAnswer, explaination) are required" },
                 { status: 400 }
             );
         }
@@ -32,9 +32,16 @@ export async function POST(req: Request){
             chosenOption,
             isCorrect,
             playedAt,
+            correctAnswer,
+            explaination,
         };
+
+        // console.log("New game history entry:", newGameHistoryEntry);
+
       
         user.gameHistory.push(newGameHistoryEntry);
+
+        console.log("New game history entry:", user.gameHistory[user.gameHistory.length - 1]);
 
         if (!user.categoryStats) {
             user.categoryStats = new Map();

@@ -18,6 +18,8 @@ interface ProfileStatsProps {
             chosenOption: string;
             isCorrect: boolean;
             playedAt: Date;
+            correctAnswer: string;
+            explaination: string;
         }[];
     };
 }
