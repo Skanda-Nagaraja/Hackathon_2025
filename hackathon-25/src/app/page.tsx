@@ -1,42 +1,69 @@
 "use client"
 
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import ModeToggle from "@/components/mode-toggle"
-import { Wallet, TrendingUp, CreditCard, PiggyBank, Receipt, LineChart, Home, Shield } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 
-const categories = [
-  { name: "Budgeting", icon: Wallet },
-  { name: "Investments", icon: TrendingUp },
-  { name: "Credit & Loans", icon: CreditCard },
-  { name: "Savings", icon: PiggyBank },
-  { name: "Taxes", icon: Receipt },
-  { name: "Retirement Planning", icon: LineChart },
-  { name: "Housing and Rent", icon: Home },
-  { name: "Insurance", icon: Shield },
-]
+export default function LoginPage() {
+  const router = useRouter()
 
-export default function ChallengePage() {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    router.push("/dashboard")
+  }
+
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-zinc-50 dark:bg-zinc-950">
-      <div className="absolute top-4 right-4">
-        <ModeToggle />
-      </div>
-      <h1 className="text-3xl font-bold text-center mb-12 text-zinc-900 dark:text-zinc-100">
-        Financial Literacy Challenge
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto">
-        {categories.map((category, index) => (
-          <Link href={`/problem/${encodeURIComponent(category.name)}`} key={index} className="h-full">
-            <Button
-              variant="outline"
-              className="w-full h-full min-h-[200px] p-8 flex flex-col items-center justify-center gap-4 text-lg font-medium transition-all hover:scale-[1.02] hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:border-zinc-700"
-            >
-              <category.icon className="w-12 h-12" />
-              {category.name}
-            </Button>
+    <div className="flex min-h-screen">
+      <div className="hidden lg:flex lg:flex-1 bg-zinc-900 text-white p-12 relative flex-col justify-between">
+        <div>
+          <Link href="/" className="text-xl font-bold">
+            MoneyMind
           </Link>
-        ))}
+        </div>
+        <div className="max-w-md">
+          <blockquote className="text-lg font-medium mb-4">
+            "An investment in knowledge pays the best interest."
+          </blockquote>
+          <cite className="text-zinc-400">Benjamin Franklin</cite>
+        </div>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-8 bg-zinc-950">
+        <div className="max-w-sm w-full">
+          <h1 className="text-2xl font-semibold tracking-tight mb-8">Welcome back</h1>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label
+                htmlFor="username"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Username
+              </label>
+              <Input
+                id="username"
+                placeholder="Enter your username"
+                type="text"
+                autoCapitalize="none"
+                autoComplete="username"
+                autoCorrect="off"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="password"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Password
+              </label>
+              <Input id="password" placeholder="Enter your password" type="password" autoComplete="current-password" />
+            </div>
+            <Button type="submit" className="w-full">
+              Sign In
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   )
