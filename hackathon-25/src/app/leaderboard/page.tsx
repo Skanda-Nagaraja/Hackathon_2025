@@ -4,41 +4,67 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Trophy, User, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+
 import { UserProvider, useUser } from "../UserContext"
 
 import  ModeToggle  from "@/components/mode-toggle"
+
+
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useEffect, useState } from "react"
 
 
-// Mock data for the leaderboard
-const leaderboardData = [
-  { rank: 1, username: "FinancePro", points: 15420 },
-  { rank: 2, username: "InvestorGuru", points: 14250 },
-  { rank: 3, username: "MoneyMaster", points: 13890 },
-  { rank: 4, username: "SavingsKing", points: 12760 },
-  { rank: 5, username: "BudgetQueen", points: 11980 },
-  { rank: 6, username: "StockTrader", points: 11540 },
-  { rank: 7, username: "WealthBuilder", points: 10890 },
-  { rank: 8, username: "CryptoWhiz", points: 10450 },
-  { rank: 9, username: "RetirementPro", points: 9870 },
-  { rank: 10, username: "TaxExpert", points: 9340 },
-  { rank: 11, username: "RealEstateGuru", points: 8920 },
-  { rank: 12, username: "InsurancePro", points: 8450 },
-  { rank: 13, username: "DebtSlayer", points: 8120 },
-  { rank: 14, username: "DividendKing", points: 7890 },
-  { rank: 15, username: "BondTrader", points: 7560 },
-]
+
+
 
 export default function LeaderboardPage() {
   const router = useRouter()
   const { user } = useUser()
+
+// Define the user type
+interface LeaderboardUser {
+  username: string
+  totalPoints: number
+}
+
+export default function LeaderboardPage() {
+  const router = useRouter()
+  const [leaderboardData, setLeaderboardData] = useState<(LeaderboardUser & { rank: number })[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch('/api/leaderboard')
+        const data = await response.json()
+
+        // Add rank to each user and sort by points
+        const rankedData = data
+          .sort((a: LeaderboardUser, b: LeaderboardUser) => b.totalPoints - a.totalPoints)
+          .map((user: LeaderboardUser, index: number) => ({
+            ...user,
+            rank: index + 1
+          }))
+        console.log(rankedData)
+        setLeaderboardData(rankedData)
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchLeaderboard()
+  }, [])
+
 
   const handleLogout = () => {
     router.push("/")
@@ -103,18 +129,32 @@ export default function LeaderboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {leaderboardData.map((entry) => (
-                  <TableRow key={entry.rank} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                    <TableCell className="font-medium">
-                      {entry.rank === 1 && "🥇"}
-                      {entry.rank === 2 && "🥈"}
-                      {entry.rank === 3 && "🥉"}
-                      {entry.rank > 3 && `#${entry.rank}`}
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center py-8">
+                      Loading...
                     </TableCell>
-                    <TableCell>{entry.username}</TableCell>
-                    <TableCell className="text-right font-medium">{entry.points.toLocaleString()}</TableCell>
                   </TableRow>
-                ))}
+                ) : leaderboardData.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center py-8">
+                      No data available
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  leaderboardData.map((entry) => (
+                    <TableRow key={entry.username} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                      <TableCell className="font-medium">
+                        {entry.rank === 1 && "🥇"}
+                        {entry.rank === 2 && "🥈"}
+                        {entry.rank === 3 && "🥉"}
+                        {entry.rank > 3 && `#${entry.rank}`}
+                      </TableCell>
+                      <TableCell>{entry.username}</TableCell>
+                      <TableCell className="text-right font-medium">{entry.totalPoints}</TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
